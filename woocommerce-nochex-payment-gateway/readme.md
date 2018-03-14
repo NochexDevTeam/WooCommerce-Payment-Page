@@ -52,6 +52,11 @@ __*You can select the radio button next to this option to make it the default ga
 * **Save Changes.** 
 
 == Changelog ==
+
+= 2.1 =
+
+* Update - Added Billing and Delivery Country Field to pre-populate the Billing and Delivery Country on the payment page*
+
 = 2 =
 
 * New Features and Settings *
