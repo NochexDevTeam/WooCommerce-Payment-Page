@@ -313,11 +313,13 @@ $this->writeDebug($descriptionItems);
 	<input type="hidden" name="billing_fullname" value="'.$order->billing_first_name.' '.$order->billing_last_name.'" />				
 	<input type="hidden" name="billing_address" value="'.$order->billing_address_1.' '.$order->billing_address_2.'" />				
 	<input type="hidden" name="billing_city" value="'.$order->billing_city.'" />				
-	<input type="hidden" name="billing_postcode" value="'.$order->billing_postcode.'" />				
+	<input type="hidden" name="billing_postcode" value="'.$order->billing_postcode.'" />
+	<input type="hidden" name="billing_country" value="'.$order->get_billing_country().'" />					
 	<input type="hidden" name="delivery_fullname" value="'.$order->shipping_first_name.' '.$order->shipping_last_name.'" />				
 	<input type="hidden" name="delivery_address" value="'.$order->shipping_address_1.' '.$order->shipping_address_2.'" />				
 	<input type="hidden" name="delivery_city" value="'.$order->shipping_city.'" />				
-	<input type="hidden" name="delivery_postcode" value="'.$order->shipping_postcode.'" />				
+	<input type="hidden" name="delivery_postcode" value="'.$order->shipping_postcode.'" />
+	<input type="hidden" name="delivery_country" value="'.$order->get_shipping_country().'" />					
 	<input type="hidden" name="email_address" value="'.$order->billing_email.'" />				
 	<input type="hidden" name="customer_phone_number" value="'.$order->billing_phone.'" />				
 	<input type="hidden" name="success_url" value="'.$this->get_return_url( $order ).'&finished=1" />				
