@@ -39,19 +39,29 @@ it easy for your customers to use and for you to get paid, and we back that up w
 * Configure your Nochex Gateway settings. See below for details.
 
 = Connect to WooCommerce =
-To configure the plugin, go to **WooCommerce > Settings** from the left hand menu, then the top tab "Payment Gateways". You should see __"Nochex"__ as an option at the top of the screen. 
+To configure the plugin, go to **WooCommerce > Settings** from the left hand menu, then the top tab "Payment Gateways". You should see __" Nochex"__ as an option at the top of the screen. 
 __*You can select the radio button next to this option to make it the default gateway.*__
 
-* **Enable/Disable** - check the box to enable Nochex.
-* **Title** - allows you to determine what your customers will see this payment option as on the checkout page.  
-* **Checkout Message** - controls the message that appears under the payment fields on the checkout page. Here you can list the types of cards you accept. 
-* **Nochex Merchant ID/Email** - enter your Nochex account email address or Merchant ID. 
-* **Hide Billing Details** - optional feature, if enabled the billing address details will be hidden when the customer is sent to Nochex.
-* **Nochex Test Mode** - check to enable Nochex test mode, uncheck to enable LIVE transactions.  
-* **Debug Log** - a log will be kept of all important information regarding Nochex usage, e.g. customer sent to Nochex, whether or not APC has passed etc.
-* **Save Changes.** 
+* ** Enable/Disable** - check the box to enable Nochex.
+* ** Title** - allows you to determine what your customers will see this payment option as on the checkout page.  
+* ** Checkout Message** - controls the message that appears under the payment fields on the checkout page. Here you can list the types of cards you accept. 
+* ** Nochex Merchant ID/Email** - enter your Nochex account email address or Merchant ID. 
+* ** Hide Billing Details** - optional feature, if enabled the billing address details will be hidden when the customer is sent to Nochex.
+* ** Nochex Test Mode** - check to enable Nochex test mode, uncheck to enable LIVE transactions.  
+* ** Debug Log** - a log will be kept of all important information regarding Nochex usage, e.g. customer sent to Nochex, whether or not APC has passed etc.
+* ** Save Changes.** 
 
 == Changelog ==
+
+= 2.2 =
+
+* Update - Fixed the product amount that was passed through to the payment page (Had been missing the Tax amount) Total amount was passed through correctly.
+
+* Bug Fixes *
+
+- If woocommerce was disabled then the Nochex module would produce an error message // Resolved
+- Data collected about an order were using old / depreciated functions // Resolved
+- APC / Callback - Optional_2 would show an error message if no value was returned // Resolved
 
 = 2.1 =
 
