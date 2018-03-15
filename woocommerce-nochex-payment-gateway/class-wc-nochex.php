@@ -2,10 +2,13 @@
 /*
 Plugin Name: Nochex Payment Gateway for Woocommerce
 Description: Accept Nochex Payments, orders are updated using APC.
-Version: 2
+Version: 2.2
 Author: Nochex Ltd
 License: GPL2
 */
+
+if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) {
+
 add_action('plugins_loaded', 'woocommerce_nochex_init', 0);
 function woocommerce_nochex_init() {
 
@@ -218,14 +221,13 @@ class wc_nochex extends WC_Payment_Gateway {
 	/**
 	* Generated Nochex Payment Form 
 	*/
-	public function generate_nochex_form( $order_id ) {	
+	private function generate_nochex_form( $order_id ) {	
 	
 	global $woocommerce;		
-	$order = new WC_Order( $order_id );	
-	$order_id = $order->id;
+	$orders = new WC_Order( $order_id );	
+	/*$order_id = $order->id;*/
 	
 	/* Nochex Features - check to see if they are present, and updates the value on the payment form*/
-	/* Hide Billing Details */
 	if ($this->callbackNew == 'yes'){			
 		$optional_2 = "Enabled";
 	}else{
@@ -245,14 +247,15 @@ class wc_nochex extends WC_Payment_Gateway {
 		$testTransaction = '0';
 	}
 	
-	/* Show Postage */	
+	/* Show Postage */		
 	if ($this->showPostage == 'yes'){					
-		$amountPostageTotal = number_format( $order->get_total_shipping() + $order->get_shipping_tax(), 2, '.', '' );				
-		$amountTotal = number_format( $order->order_total - $amountPostageTotal, 2, '.', '' );				
+		$amountPostageTotal = number_format( $orders->get_total_shipping() + $orders->get_shipping_tax(), 2, '.', '' );				
+		$amountTotal = number_format( $orders->get_total() - $amountPostageTotal, 2, '.', '' );				
 	}else{				
-		$amountTotal = number_format( $order->order_total, 2, '.', '' );
+		$amountTotal = number_format( $orders->get_total(), 2, '.', '' );
 		$amountPostageTotal= number_format( 0, 2, '.', '' );		
 	}
+
 
 	// Debug - Features
 	$featItems = 'Order Details: - Hide Billing Details Feature: ' . $this->hide_billing_details . '. \n Test Mode Feature: ' . $this->test_mode. '.\n Show Postage Feature - ' . $this->showPostage . ", XML Collection Feature: " . $this->xmlitemcollection;
@@ -262,25 +265,26 @@ class wc_nochex extends WC_Payment_Gateway {
 	$description = '';		
 	
 	$item_collect = '<items>';		
-	if ( sizeof( $order->get_items() ) > 0 ) {			
-	foreach ( $order->get_items() as $item ) {				
+	if ( sizeof( $orders->get_items() ) > 0 ) {			
+	foreach ( $orders->get_items() as $item ) {				
 	
 	if ( $item['qty'] ) {						
 	
 	$item_loop++;						
-	$product = $order->get_product_from_item( $item );						
+	$product = $orders->get_product_from_item( $item );						
 	$item_name 	= $item['name'];						
-	$item_meta = new WC_Order_Item_Meta( $item['item_meta'] );						
+	$item_meta = new WC_Order_Item_Product( $item['item_meta'] );						
 		
 	$filterName = filter_var($item['name'], FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_HIGH | FILTER_FLAG_STRIP_LOW);
 	$filterName = str_replace('|', ',', $filterName);	
+	$taxing = $orders->get_line_tax( $item, false) + $orders->get_item_total( $item, false );
 	
 	/* Description */
-	$product = $order->get_product_from_item( $item );			
-	$description .= $filterName .", qty ordered " . $item['qty'] . " x " . number_format($order->get_item_total( $item, false ), 2, '.', '' ) . ", ";
+	$product = $orders->get_product_from_item( $item );			
+	$description .= $filterName .", qty ordered " . $item['qty'] . " x " . number_format($taxing, 2, '.', '' )  . ", ";
  
 	/* XML Collection */
-	$item_collect.= "<item><id></id><name>". $filterName . "</name><description>". $filterName . "</description><quantity>" . $item['qty'] . "</quantity><price>" . number_format($order->get_item_total( $item, false ), 2, '.', '' ) . "</price></item>";				
+	$item_collect.= "<item><id></id><name>". $filterName . "</name><description>". $filterName . "</description><quantity>" . $item['qty'] . "</quantity><price>" . number_format($taxing, 2, '.', '' ) . "</price></item>";				
 	}			
 	}		
 	}		
@@ -298,7 +302,7 @@ $descriptionItems = 'Order Details: - Description: ' . $description . '. \n XML 
 $this->writeDebug($descriptionItems);	
 	
 /*Nochex Payment Form - Fields & Values*/
-	$displayForm = '<div style="background:white;position:fixed;width:100%;height:100%;z-index:1;top:0px;left:0px;" id="ncxBackgroundForm"></div>
+	$displayForm = '<style>#loader{display:none!important}</style><div style="background:white;position:fixed;width:100%;height:100%;z-index:1;top:0px;left:0px;" id="ncxBackgroundForm"></div>
 	<div id="ncxForm" style="z-index: 10;position: fixed;top: 300px;text-align:center;">
 	<i style="font-size: 60px;margin: 25px;" class="fa fa-spinner fa-spin"></i>
 	<form action="https://secure.nochex.com/default.aspx" method="post" id="nochex_payment_form">				
@@ -308,25 +312,25 @@ $this->writeDebug($descriptionItems);
 	<input type="hidden" name="xml_item_collection" value="'.$item_collect .'" />				
 	<input type="hidden" name="description" value="'.$description .'" />				
 	<input type="hidden" name="order_id" value="'.$order_id.'" />							
-	<input type="hidden" name="optional_1" value="'.serialize( array( $order_id, $order->order_key ) ).'" />							
+	<input type="hidden" name="optional_1" value="'.serialize( array( $order_id, $orders->get_order_key() ) ).'" />							
 	<input type="hidden" name="optional_2" value="'.$optional_2.'" />							
-	<input type="hidden" name="billing_fullname" value="'.$order->billing_first_name.' '.$order->billing_last_name.'" />				
-	<input type="hidden" name="billing_address" value="'.$order->billing_address_1.' '.$order->billing_address_2.'" />				
-	<input type="hidden" name="billing_city" value="'.$order->billing_city.'" />				
-	<input type="hidden" name="billing_postcode" value="'.$order->billing_postcode.'" />
-	<input type="hidden" name="billing_country" value="'.$order->get_billing_country().'" />					
-	<input type="hidden" name="delivery_fullname" value="'.$order->shipping_first_name.' '.$order->shipping_last_name.'" />				
-	<input type="hidden" name="delivery_address" value="'.$order->shipping_address_1.' '.$order->shipping_address_2.'" />				
-	<input type="hidden" name="delivery_city" value="'.$order->shipping_city.'" />				
-	<input type="hidden" name="delivery_postcode" value="'.$order->shipping_postcode.'" />
-	<input type="hidden" name="delivery_country" value="'.$order->get_shipping_country().'" />					
-	<input type="hidden" name="email_address" value="'.$order->billing_email.'" />				
-	<input type="hidden" name="customer_phone_number" value="'.$order->billing_phone.'" />				
-	<input type="hidden" name="success_url" value="'.$this->get_return_url( $order ).'&finished=1" />				
+	<input type="hidden" name="billing_fullname" value="'.$orders->get_billing_first_name().' '.$orders->get_billing_last_name().'" />				
+	<input type="hidden" name="billing_address" value="'.$orders->get_billing_address_1().' '.$orders->get_billing_address_2().'" />				
+	<input type="hidden" name="billing_city" value="'.$orders->get_billing_city().'" />
+	<input type="hidden" name="billing_country" value="'.$orders->get_billing_country().'" />					
+	<input type="hidden" name="billing_postcode" value="'.$orders->get_billing_postcode().'" />				
+	<input type="hidden" name="delivery_fullname" value="'.$orders->get_shipping_first_name().' '.$orders->get_shipping_last_name().'" />				
+	<input type="hidden" name="delivery_address" value="'.$orders->get_shipping_address_1().' '.$orders->get_shipping_address_2().'" />				
+	<input type="hidden" name="delivery_city" value="'.$orders->get_shipping_city().'" />			
+	<input type="hidden" name="delivery_country" value="'.$orders->get_shipping_country().'" />			
+	<input type="hidden" name="delivery_postcode" value="'.$orders->get_shipping_postcode().'" />				
+	<input type="hidden" name="email_address" value="'.$orders->get_billing_email().'" />				
+	<input type="hidden" name="customer_phone_number" value="'.$orders->get_billing_phone().'" />				
+	<input type="hidden" name="success_url" value="'.$this->get_return_url( $orders ).'&finished=1" />				
 	<input type="hidden" name="hide_billing_details" value="'.$hide_billing_details.'" />				
 	<input type="hidden" name="callback_url" value="'.$this->callback_url.'" />				
-	<input type="hidden" name="cancel_url" value="'.$order->get_cancel_order_url().'" />				
-	<input type="hidden" name="test_success_url" value="'.$this->get_return_url( $order ).'&finished=1" />				
+	<input type="hidden" name="cancel_url" value="'.$orders->get_cancel_order_url().'" />				
+	<input type="hidden" name="test_success_url" value="'.$this->get_return_url( $orders ).'&finished=1" />				
 	<input type="hidden" name="test_transaction" value="'.$testTransaction.'" />
 	<p>If you are not transferred to Nochex shortly,<br/>Press the button below;</p>				
 	<input type="submit" style="background-color:#08c;color:#fff;" class="button-alt" id="submit_nochex_payment_form" value="'.__('Pay via Nochex', 'woocommerce').'" /> 				
@@ -369,7 +373,7 @@ $this->writeDebug($descriptionItems);
 
 		if(isset($_POST['order_id'])){
 		
-		if($_POST['optional_2'] == "Enabled"){
+		if(isset($_POST['optional_2']) == "Enabled"){
 			
 				$order = new WC_Order ( $_POST['order_id'] );
 			
@@ -533,4 +537,6 @@ $this->writeDebug($descriptionItems);
 	}
 
 	add_filter('woocommerce_payment_gateways', 'woocommerce_add_nochex_gateway' );
+}
+
 }
