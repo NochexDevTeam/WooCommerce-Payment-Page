@@ -1,8 +1,9 @@
 <?php
 /*
 Plugin Name: Nochex Payment Gateway for Woocommerce
-Description: Accept Nochex Payments, orders are updated using APC.
-Version: 2.2
+Plugin URI: https://github.com/NochexDevTeam/WooCommerce
+Description: Accept Nochex Payments in Woocommerce.
+Version: 2.3
 Author: Nochex Ltd
 License: GPL2
 */
@@ -18,7 +19,7 @@ class wc_nochex extends WC_Payment_Gateway {
 	global $woocommerce;
 	
 		$this->id				= 'nochex';
-		$this->icon 			=  WP_PLUGIN_URL . "/" . plugin_basename( dirname(__FILE__)) . '/images/clear-amex-mp.png';
+		$this->icon 			=  plugins_url('images/clear-amex-mp.png', __FILE__ );
 		$this->has_fields 		= false;
 		$this->method_title     = __( 'Nochex', 'woocommerce' );
 		// Load the form fields.
@@ -27,9 +28,9 @@ class wc_nochex extends WC_Payment_Gateway {
 		$this->init_settings();		
 		
 		if($this->settings['hide_billing_details'] == "Yes" || $this->settings['hide_billing_details'] == "yes"){		
-		$billingNote = "<p style=\"font-weight:bold;margin-bottom:10px!important\">".$this->settings['description']."</p><p style=\"font-weight:bold;color:red;\">Please check your billing address details match the details on your card that you are going to use.</p>"; 
+			$billingNote = "<p style=\"font-weight:bold;margin-bottom:10px!important\">".$this->settings['description']."</p><p style=\"font-weight:bold;color:red;\">Please check your billing address details match the details on your card that you are going to use.</p>"; 
 		}else{
-		$billingNote = $this->settings['description'];      
+			$billingNote = $this->settings['description'];      
 		}
 		
 		// Define user set variables
@@ -73,7 +74,6 @@ class wc_nochex extends WC_Payment_Gateway {
 	*/
 		public function writeDebug($DebugData){
 	// Calls the configuration information about a control in the module config. 
-	//$nochex_debug = Configuration::get('NOCHEX_APC_DEBUG');
 	// If the control nochex_debug has been checked in the module config, then it will use data sent and received in this function which will write to the nochex_debug file
 		if ($this->debug == 'yes'){
 		// Receives and stores the Date and Time
@@ -81,25 +81,23 @@ class wc_nochex extends WC_Payment_Gateway {
 		// Puts together, Date and Time, as well as information in regards to information that has been received.
 		$stringData = "\n Time and Date: " . $debug_TimeDate . "... " . $DebugData ."... ";
 		 // Try - Catch in case any errors occur when writing to nochex_debug file.
-			try
-			{
-			// Variable with the name of the debug file.
-				$debugging = "wp-content/plugins/woocommerce-nochex-payment-gateway/nochex_debug.txt";
-			// variable which will open the nochex_debug file, or if it cannot open then an error message will be made.
+		try{
+				// Variable with the name of the debug file.
+				$debugging = plugin_dir_path( __FILE__ ) . "nochex_debug.txt"; 
+				// variable which will open the nochex_debug file, or if it cannot open then an error message will be made.
 				$f = fopen($debugging, 'a') or die("File can't open");
-			// Open and write data to the nochex_debug file.
-			$ret = fwrite($f, $stringData);
-			// Incase there is no data being shown or written then an error will be produced.
-			if ($ret === false)
-			die("Fwrite failed");
-			
+				// Open and write data to the nochex_debug file.
+				$ret = fwrite($f, $stringData);
+				// Incase there is no data being shown or written then an error will be produced.
+				if ($ret === false)
+				die("Fwrite failed");			
 				// Closes the open file.
 				fclose($f)or die("File not close");
 			} 
 			//If a problem or something doesn't work, then the catch will produce an email which will send an error message.
 			catch(Exception $e)
 			{
-			mail($this->email, "Debug Check Error Message", $e->getMessage());
+				error_log($e);
 			}
 		}
 	}
@@ -207,9 +205,12 @@ class wc_nochex extends WC_Payment_Gateway {
 	 * receipt_page
 	**/
 	function receipt_page( $order ) {
-				
-		if ($_REQUEST["finished"] == "1") {
-		echo '<h4 style="color:darkgreen;">'.__('Your order has been paid!', 'woocommerce').'</h4>';
+		
+		$checkSuccess = esc_html($_REQUEST["finished"]);		
+		$successVal = sanitize_text_field($_REQUEST["finished"]);
+		
+		if ($successVal == "1") {
+			echo '<h4 style="color:darkgreen;">'.__('Your order has been paid!', 'woocommerce').'</h4>';
 		}else{
 			echo "<style> .payment_method_nochex img{max-height: 80px;height: 80px;margin-left: 50px!important;} </style>";
 			echo '<p>'.__('If you are not transferred to Nochex click the button below.', 'woocommerce').'</p>';
@@ -225,7 +226,6 @@ class wc_nochex extends WC_Payment_Gateway {
 	
 	global $woocommerce;		
 	$orders = new WC_Order( $order_id );	
-	/*$order_id = $order->id;*/
 	
 	/* Nochex Features - check to see if they are present, and updates the value on the payment form*/
 	if ($this->callbackNew == 'yes'){			
@@ -256,7 +256,6 @@ class wc_nochex extends WC_Payment_Gateway {
 		$amountPostageTotal= number_format( 0, 2, '.', '' );		
 	}
 
-
 	// Debug - Features
 	$featItems = 'Order Details: - Hide Billing Details Feature: ' . $this->hide_billing_details . '. \n Test Mode Feature: ' . $this->test_mode. '.\n Show Postage Feature - ' . $this->showPostage . ", XML Collection Feature: " . $this->xmlitemcollection;
 	$this->writeDebug($featItems); 
@@ -285,6 +284,7 @@ class wc_nochex extends WC_Payment_Gateway {
  
 	/* XML Collection */
 	$item_collect.= "<item><id></id><name>". $filterName . "</name><description>". $filterName . "</description><quantity>" . $item['qty'] . "</quantity><price>" . number_format($taxing, 2, '.', '' ) . "</price></item>";				
+	
 	}			
 	}		
 	}		
@@ -297,49 +297,78 @@ class wc_nochex extends WC_Payment_Gateway {
 		$item_collect = "";
 	}	
 	
-// Debug - Features
-$descriptionItems = 'Order Details: - Description: ' . $description . '. \n XML Item Collection: ' . $item_collect;
-$this->writeDebug($descriptionItems);	
-	
-/*Nochex Payment Form - Fields & Values*/
-	$displayForm = '<style>#loader{display:none!important}</style><div style="background:white;position:fixed;width:100%;height:100%;z-index:1;top:0px;left:0px;" id="ncxBackgroundForm"></div>
+	// Debug - Features
+	$descriptionItems = 'Order Details: - Description: ' . $description . '. \n XML Item Collection: ' . $item_collect;
+	$this->writeDebug($descriptionItems);	
+			
+	/* Sanitize Input */
+	$billing_first_name = sanitize_text_field($orders->get_billing_first_name());
+	$billing_last_name = sanitize_text_field($orders->get_billing_last_name());
+	$billing_address_line_1 = sanitize_text_field($orders->get_billing_address_1());
+	$billing_address_line_2 = sanitize_text_field($orders->get_billing_address_2());
+	$billing_city = sanitize_text_field($orders->get_billing_city());
+	$billing_country = sanitize_text_field($orders->get_billing_country());
+	$billing_postcode = sanitize_text_field($orders->get_billing_postcode());
+
+	$shipping_first_name = sanitize_text_field($orders->get_shipping_first_name());
+	$shipping_last_name = sanitize_text_field($orders->get_shipping_last_name());
+	$shipping_address_line_1 = sanitize_text_field($orders->get_shipping_address_1());
+	$shipping_address_line_2 = sanitize_text_field($orders->get_shipping_address_2());
+	$shipping_city = sanitize_text_field($orders->get_shipping_city());
+	$shipping_country = sanitize_text_field($orders->get_shipping_country());
+	$shipping_postcode = sanitize_text_field($orders->get_shipping_postcode());
+
+	$contact_number = sanitize_text_field($orders->get_billing_phone());
+	$email_address = sanitize_email($orders->get_billing_email());
+
+	/* clean urls */
+	$cancel_url = $orders->get_cancel_order_url();
+	$success_url = $this->get_return_url( $orders ) . "&finished=1";
+	$callback_url = $this->callback_url;
+
+	$cancel_url_clean = esc_url( $cancel_url );
+	$success_url_clean = esc_url( $success_url );
+	$callback_url_clean = esc_url( $callback_url );
+			
+	/* Nochex Payment Form - Fields & Values */
+	$displayForm = '<style>#loader{display:none!important}</style>
+	<div style="background:white;position:fixed;width:100%;height:100%;z-index:1;top:0px;left:0px;" id="ncxBackgroundForm"></div>
 	<div id="ncxForm" style="z-index: 10;position: fixed;top: 300px;text-align:center;">
 	<i style="font-size: 60px;margin: 25px;" class="fa fa-spinner fa-spin"></i>
 	<form action="https://secure.nochex.com/default.aspx" method="post" id="nochex_payment_form">				
-	<input type="hidden" name="merchant_id" value="'.$this->merchant_id.'" />				
+	<input type="hidden" name="merchant_id" value="'.esc_html($this->merchant_id).'" />				
 	<input type="hidden" name="amount" value="'.$amountTotal.'" />				
 	<input type="hidden" name="Postage" value="'.$amountPostageTotal.'" />				
 	<input type="hidden" name="xml_item_collection" value="'.$item_collect .'" />				
-	<input type="hidden" name="description" value="'.$description .'" />				
-	<input type="hidden" name="order_id" value="'.$order_id.'" />							
+	<input type="hidden" name="description" value="'.esc_html($description).'" />				
+	<input type="hidden" name="order_id" value="'.esc_html($order_id).'" />							
 	<input type="hidden" name="optional_1" value="'.serialize( array( $order_id, $orders->get_order_key() ) ).'" />							
 	<input type="hidden" name="optional_2" value="'.$optional_2.'" />							
-	<input type="hidden" name="billing_fullname" value="'.$orders->get_billing_first_name().' '.$orders->get_billing_last_name().'" />				
-	<input type="hidden" name="billing_address" value="'.$orders->get_billing_address_1().' '.$orders->get_billing_address_2().'" />				
-	<input type="hidden" name="billing_city" value="'.$orders->get_billing_city().'" />
-	<input type="hidden" name="billing_country" value="'.$orders->get_billing_country().'" />					
-	<input type="hidden" name="billing_postcode" value="'.$orders->get_billing_postcode().'" />				
-	<input type="hidden" name="delivery_fullname" value="'.$orders->get_shipping_first_name().' '.$orders->get_shipping_last_name().'" />				
-	<input type="hidden" name="delivery_address" value="'.$orders->get_shipping_address_1().' '.$orders->get_shipping_address_2().'" />				
-	<input type="hidden" name="delivery_city" value="'.$orders->get_shipping_city().'" />			
-	<input type="hidden" name="delivery_country" value="'.$orders->get_shipping_country().'" />			
-	<input type="hidden" name="delivery_postcode" value="'.$orders->get_shipping_postcode().'" />				
-	<input type="hidden" name="email_address" value="'.$orders->get_billing_email().'" />				
-	<input type="hidden" name="customer_phone_number" value="'.$orders->get_billing_phone().'" />				
-	<input type="hidden" name="success_url" value="'.$this->get_return_url( $orders ).'&finished=1" />				
+	<input type="hidden" name="billing_fullname" value="'.esc_html($billing_first_name).' '.esc_html($billing_last_name).'" />				
+	<input type="hidden" name="billing_address" value="'.esc_html($billing_address_line_1).' '.esc_html($billing_address_line_2).'" />				
+	<input type="hidden" name="billing_city" value="'.esc_html($billing_city).'" />
+	<input type="hidden" name="billing_country" value="'.esc_html($billing_country).'" />					
+	<input type="hidden" name="billing_postcode" value="'.esc_html($billing_postcode).'" />				
+	<input type="hidden" name="delivery_fullname" value="'.esc_html($shipping_first_name).' '.esc_html($shipping_last_name).'" />				
+	<input type="hidden" name="delivery_address" value="'.esc_html($shipping_address_line_1).' '.esc_html($shipping_address_line_2).'" />				
+	<input type="hidden" name="delivery_city" value="'.esc_html($shipping_city).'" />			
+	<input type="hidden" name="delivery_country" value="'.esc_html($shipping_country).'" />			
+	<input type="hidden" name="delivery_postcode" value="'.esc_html($shipping_postcode).'" />				
+	<input type="hidden" name="email_address" value="'.esc_html($email_address).'" />				
+	<input type="hidden" name="customer_phone_number" value="'.esc_html($contact_number).'" />				
+	<input type="hidden" name="success_url" value="'.$success_url_clean.'" />				
 	<input type="hidden" name="hide_billing_details" value="'.$hide_billing_details.'" />				
-	<input type="hidden" name="callback_url" value="'.$this->callback_url.'" />				
-	<input type="hidden" name="cancel_url" value="'.$orders->get_cancel_order_url().'" />				
-	<input type="hidden" name="test_success_url" value="'.$this->get_return_url( $orders ).'&finished=1" />				
+	<input type="hidden" name="callback_url" value="'.$callback_url_clean.'" />				
+	<input type="hidden" name="cancel_url" value="'.$cancel_url_clean.'" />				
+	<input type="hidden" name="test_success_url" value="'.$success_url_clean.'" />				
 	<input type="hidden" name="test_transaction" value="'.$testTransaction.'" />
 	<p>If you are not transferred to Nochex shortly,<br/>Press the button below;</p>				
 	<input type="submit" style="background-color:#08c;color:#fff;" class="button-alt" id="submit_nochex_payment_form" value="'.__('Pay via Nochex', 'woocommerce').'" /> 				
 	</form> 			
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-	<script type="text/javascript">			
-	$(document).ready(function(){
-     $("#nochex_payment_form").submit();
-	});			
+	<script type="text/javascript">
+		window.onload = function(){
+				document.getElementById("nochex_payment_form").submit();
+		}
 	</script></div>';		
 		
 	// Debug - Features
@@ -358,8 +387,8 @@ $this->writeDebug($descriptionItems);
 		$order = new WC_Order( $order_id );
 		
 		return array(					
-		'result' 	=> 'success',					
-		'redirect'	=> $this->get_return_url( $order ) . "&finished=0"			
+			'result' 	=> 'success',					
+			'redirect'	=> $this->get_return_url( $order ) . "&finished=0"			
 		);
     }
 	/**
@@ -370,18 +399,41 @@ $this->writeDebug($descriptionItems);
 	 */
 	function apc() {
 		global $woocommerce;
-
-		if(isset($_POST['order_id'])){
 		
-		if(isset($_POST['optional_2']) == "Enabled"){
-			
-				$order = new WC_Order ( $_POST['order_id'] );
-			
-			if ( $order->get_total() != $_POST['amount'] ) {
-	
-				// Put this order on-hold for manual checking
-				$order->update_status( 'on-hold', sprintf( __( 'Validation error: Nochex amounts do not match (total %s).', 'woocommerce' ), $_POST['amount'] ) );
 
+		if (!empty(esc_html($_POST['order_id']))) {
+		
+		$order_id = sanitize_text_field($_POST['order_id']);
+		$order_id = esc_html($order_id);
+		$transaction_amount = sanitize_text_field($_POST['amount']);		
+		$transaction_amount = esc_html($transaction_amount);		
+		
+		$transaction_id = sanitize_text_field($_POST['transaction_id']);
+		$transaction_id = esc_html($transaction_id);
+		$transaction_date = sanitize_text_field($_POST['transaction_date']);
+		$transaction_date = esc_html($transaction_date);
+		
+		if(!empty($_POST['optional_2'])){
+			$callback_enabled = sanitize_text_field($_POST['optional_2']);	
+			$callback_enabled = esc_html($callback_enabled);	
+		}else{
+			$callback_enabled = "Disabled";
+		} 
+				
+		if($callback_enabled == "Enabled"){
+		
+			$callback_transaction_status = sanitize_text_field($_POST['transaction_status']);
+			$callback_transaction_status = esc_html($callback_transaction_status);
+			$callback_transaction_to = sanitize_text_field($_POST['merchant_id']);
+			$callback_transaction_to = esc_html($callback_transaction_to);
+			$callback_transaction_from = sanitize_text_field($_POST['email_address']);
+			$callback_transaction_from = esc_html($callback_transaction_from);
+			
+			$order = new WC_Order ($order_id);
+			
+			if ( $order->get_total() != $transaction_amount ) {
+				// Put this order on-hold for manual checking
+				$order->update_status( 'on-hold', sprintf( __( 'Validation error: Nochex amounts do not match (total %s).', 'woocommerce' ), $transaction_amount ) );
 				return;
 			}
 			
@@ -405,24 +457,23 @@ $this->writeDebug($descriptionItems);
 				$FormFields = 'Order Details: - APC Output: ' . $output;
 				$this->writeDebug($FormFields);	
 				
-				$apcFieldsReturn = 'APC Fields: to_email: ' . $_POST['merchant_id'] . ', from_email: ' .$_POST['email_address'] .', transaction_id: ' . $_POST['transaction_id'] .', transaction_date: '.$_POST['transaction_date'] . ', order_id: ' .$_POST['order_id'] . ', amount: ' .$_POST['amount'] . ', status: ' . $_POST['transaction_status'];
+				$apcFieldsReturn = 'APC Fields: to_email: ' . $callback_transaction_to . ', from_email: ' .$callback_transaction_from.', transaction_id: ' . $transaction_id .', transaction_date: '.$transaction_date . ', 	order_id: ' .$order_id . ', amount: ' .$transaction_amount . ', status: ' . $callback_transaction_status;
 			//Output Actions
 			
-			if ($_POST['transaction_status'] == "100"){
-			$status = " TEST";
+			if ($callback_transaction_status == "100"){
+				$status = " TEST";
 			}else{
-			$status = " LIVE";
+				$status = " LIVE";
 			}
 			
 			if( $output == 'AUTHORISED' ) {
 			
-				// Notes for an Order - Output status (AUTHORISED / DECLINED), and Transaction Status (Test / Live)
-			
-			$callbackNotes = "<ul style=\"list-style:none;\"><li>Callback: " . $output . "</li>";			
-			$callbackNotes .= "<li>Transaction Status: " . $status . "</li>";			
-			$callbackNotes .= "<li>Transaction ID: ".$_POST["transaction_id"] . "</li>";
-			$callbackNotes .= "<li>Payment Received From: ".$_POST["email_address"] . "</li>";			
-			$callbackNotes .= "<li>Total Paid: ".$_POST["gross_amount"] . "</li></ul>";	
+				// Notes for an Order - Output status (AUTHORISED / DECLINED), and Transaction Status (Test / Live)			
+				$callbackNotes = "<ul style=\"list-style:none;\"><li>Callback: " . $output . "</li>";			
+				$callbackNotes .= "<li>Transaction Status: " . $status . "</li>";			
+				$callbackNotes .= "<li>Transaction ID: ".$transaction_id . "</li>";
+				$callbackNotes .= "<li>Payment Received From: ".$callback_transaction_from . "</li>";			
+				$callbackNotes .= "<li>Total Paid: ".$transaction_amount. "</li></ul>";	
 	
 				$order->add_order_note( $callbackNotes, $status);
 				
@@ -435,19 +486,17 @@ $this->writeDebug($descriptionItems);
 				$woocommerce->cart->empty_cart();
 				
 			} else {
-				
+								
 				//Output Action - Declined
 				$apcRequestFail =  'Callback Failed, Response: ' . $output . ', ' . $apcFieldsReturn;
-			
-				// Notes for an Order - Output status (AUTHORISED / DECLINED), and Transaction Status (Test / Live)
-					
-			$callbackNotes = "<ul style=\"list-style:none;\"><li>Callback: " . $output . "</li>";			
-			$callbackNotes .= "<li>Transaction Status: " . $status . "</li>";			
-			$callbackNotes .= "<li>Transaction ID: ".$_POST["transaction_id"] . "</li>";
-			$callbackNotes .= "<li>Payment Received From: ".$_POST["email_address"] . "</li>";			
-			$callbackNotes .= "<li>Total Paid: ".$_POST["gross_amount"] . "</li></ul>";	
 				
-				//$callbackNotes = "Callback:".$output.",<br/> Transaction Status:".$status.", Transaction ID:".$_POST['transaction_id'].", Payment Received from:".$_POST['email_address'].", Total Amount Paid:".$_POST['gross_amount'].".";
+				// Notes for an Order - Output status (AUTHORISED / DECLINED), and Transaction Status (Test / Live)
+						
+				$callbackNotes = "<ul style=\"list-style:none;\"><li>Callback: " . $output . "</li>";			
+				$callbackNotes .= "<li>Transaction Status: " . $status . "</li>";			
+				$callbackNotes .= "<li>Transaction ID: ". $transaction_id . "</li>";
+				$callbackNotes .= "<li>Payment Received From: ". $callback_transaction_from . "</li>";			
+				$callbackNotes .= "<li>Total Paid: ". $transaction_amount . "</li></ul>";	
 				
 				$order->add_order_note( $callbackNotes, $status );
 				
@@ -460,12 +509,19 @@ $this->writeDebug($descriptionItems);
 			
 		}else{
 		
-		$order = new WC_Order ( $_POST['order_id'] );
+			$apc_transaction_status = sanitize_text_field($_POST['status']);
+			$apc_transaction_status = esc_html($apc_transaction_status);
+			$apc_transaction_to = sanitize_text_field($_POST['to_email']);
+			$apc_transaction_to = esc_html($apc_transaction_to);
+			$apc_transaction_from = sanitize_text_field($_POST['from_email']);
+			$apc_transaction_from = esc_html($apc_transaction_from);
+		
+			$order = new WC_Order ( $order_id );
 			
-			if ( $order->get_total() != $_POST['amount'] ) {
+			if ( $order->get_total() != $transaction_amount ) {
 	
 				// Put this order on-hold for manual checking
-				$order->update_status( 'on-hold', sprintf( __( 'Validation error: Nochex amounts do not match (total %s).', 'woocommerce' ), $_POST['amount'] ) );
+				$order->update_status( 'on-hold', sprintf( __( 'Validation error: Nochex amounts do not match (total %s).', 'woocommerce' ), $transaction_amount ) );
 
 				return;
 			}
@@ -490,7 +546,7 @@ $this->writeDebug($descriptionItems);
 				$FormFields = 'Order Details: - APC Output: ' . $output;
 				$this->writeDebug($FormFields);	
 				
-				$apcFieldsReturn = 'APC Fields: to_email: ' . $_POST['to_email'] . ', from_email: ' .$_POST['from_email'] .', transaction_id: ' . $_POST['transaction_id'] .', transaction_date: '.$_POST['transaction_date'] . ', order_id: ' .$_POST['order_id'] . ', amount: ' .$_POST['amount'] . ', status: ' . $_POST['status'];
+				$apcFieldsReturn = 'APC Fields: to_email: ' . $apc_transaction_to . ', from_email: ' .$apc_transaction_from .', transaction_id: ' . $transaction_id .', transaction_date: '.$transaction_date. ', order_id: ' .$order_id . ', amount: ' .$transaction_amount. ', status: ' . $apc_transaction_status;
 			//Output Actions
 			if( $output == 'AUTHORISED' ) {
 			
@@ -498,31 +554,33 @@ $this->writeDebug($descriptionItems);
 				
 				// Notes for an Order - Output status (AUTHORISED / DECLINED), and Transaction Status (Test / Live)
 				$order->add_order_note( sprintf( __('Nochex APC Passed, Response: %s', 'wc_nochex' ), $output ) );
-				$order->add_order_note( sprintf( __('Nochex Payment Status: %s', 'wc_nochex' ), $_POST['status'] ) );
+				$order->add_order_note( sprintf( __('Nochex Payment Status: %s', 'wc_nochex' ), $apc_transaction_status ) );
 				
 				// APC Debug, Output and fields
 				$apcRequestPass =  'APC Passed, Response: ' . $output . ', ' . $apcFieldsReturn;
-				$FormFields = 'Order Details: - APC AUTHORISED: ' . $apcRequestPass . ", Order Note 1: Nochex APC Passed, Response: " . $output . ", Order Note 2: Nochex Payment Status:" . $_POST['status'];
+				$FormFields = 'Order Details: - APC AUTHORISED: ' . $apcRequestPass . ", Order Note 1: Nochex APC Passed, Response: " . $output . ", Order Note 2: Nochex Payment Status:" . $apc_transaction_status;
 				$this->writeDebug($FormFields);	
 				
 				$order->payment_complete();
 				$woocommerce->cart->empty_cart();
+				
 			} else {
 				//Output Action - Declined
 				$apcRequestFail =  'APC Failed, Response: ' . $output . ', ' . $apcFieldsReturn;
 			
 				// Notes for an Order - Output status (AUTHORISED / DECLINED), and Transaction Status (Test / Live)
 				$order->add_order_note( sprintf( __('Nochex APC Failed, Response: %s', 'wc_nochex' ), $output ) );
-				$order->add_order_note( sprintf( __('Nochex Payment Status: %s', 'wc_nochex' ), $_POST['status'] ) );
+				$order->add_order_note( sprintf( __('Nochex Payment Status: %s', 'wc_nochex' ), $apc_transaction_status ) );
 				
 				// APC Debug, Output and fields
-				$FormFields = 'Order Details: - APC AUTHORISED: ' . $apcRequestFail . ", Order Note 1: Nochex APC Passed, Response: " . $output . ", Order Note 2: Nochex Payment Status:" . $_POST['status'];
+				$FormFields = 'Order Details: - APC AUTHORISED: ' . $apcRequestFail . ", Order Note 1: Nochex APC Passed, Response: " . $output . ", Order Note 2: Nochex Payment Status:" . $apc_transaction_status;
 				$this->writeDebug($FormFields);	
 				
 			}
 		
 		}
-		}else wp_die( "Nochex APC Request Failure" );
+			
+}else wp_die( "Nochex APC Page - Request Failed" );
 
 	}
 
