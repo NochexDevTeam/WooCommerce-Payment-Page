@@ -21,7 +21,9 @@ class wc_nochex extends WC_Payment_Gateway {
 		$this->id				= 'nochex';
 		$this->icon 			=  plugins_url('images/clear-amex-mp.png', __FILE__ );
 		$this->has_fields 		= false;
-		$this->method_title     = __( 'Nochex', 'woocommerce' );
+		$this->method_title     = __( 'Nochex', 'woocommerce' );	    
+	        $this->method_description	= __( 'Nochex', 'Accept payments by Nochex');
+	    
 		// Load the form fields.
 		$this->init_form_fields();		
 		// Load the settings.
@@ -292,7 +294,7 @@ class wc_nochex extends WC_Payment_Gateway {
 	$item_collect .= '</items>';
 	
 	if ($this->xmlitemcollection == 'yes'){
-		$description = "Order created: " . $order_id;
+		$description = "Order for #" . $order_id;
 	}else{
 		$item_collect = "";
 	}	
@@ -332,8 +334,8 @@ class wc_nochex extends WC_Payment_Gateway {
 			
 	/* Nochex Payment Form - Fields & Values */
 	$displayForm = '<style>#loader{display:none!important}</style>
-	<div style="background:white;position:fixed;width:100%;height:100%;z-index:1;top:0px;left:0px;" id="ncxBackgroundForm"></div>
-	<div id="ncxForm" style="z-index: 10;position: fixed;top: 300px;text-align:center;">
+	<div style="background:white;position:fixed;width:100%;height:100%;z-index:1000000;top:0px;left:0px;" id="ncxBackgroundForm"></div>
+	<div id="ncxForm" style="z-index: 1000000;position: fixed;top: 300px;text-align:center;">
 	<i style="font-size: 60px;margin: 25px;" class="fa fa-spinner fa-spin"></i>
 	<form action="https://secure.nochex.com/default.aspx" method="post" id="nochex_payment_form">				
 	<input type="hidden" name="merchant_id" value="'.esc_html($this->merchant_id).'" />				
@@ -469,10 +471,9 @@ class wc_nochex extends WC_Payment_Gateway {
 			if( $output == 'AUTHORISED' ) {
 			
 				// Notes for an Order - Output status (AUTHORISED / DECLINED), and Transaction Status (Test / Live)			
-				$callbackNotes = "<ul style=\"list-style:none;\"><li>Callback: " . $output . "</li>";			
+				$callbackNotes = "<ul style=\"list-style:none;\">";			
 				$callbackNotes .= "<li>Transaction Status: " . $status . "</li>";			
-				$callbackNotes .= "<li>Transaction ID: ".$transaction_id . "</li>";
-				$callbackNotes .= "<li>Payment Received From: ".$callback_transaction_from . "</li>";			
+				$callbackNotes .= "<li>Transaction ID: ".$transaction_id . "</li>";		
 				$callbackNotes .= "<li>Total Paid: ".$transaction_amount. "</li></ul>";	
 	
 				$order->add_order_note( $callbackNotes, $status);
@@ -492,14 +493,12 @@ class wc_nochex extends WC_Payment_Gateway {
 				
 				// Notes for an Order - Output status (AUTHORISED / DECLINED), and Transaction Status (Test / Live)
 						
-				$callbackNotes = "<ul style=\"list-style:none;\"><li>Callback: " . $output . "</li>";			
+				$callbackNotes = "<ul style=\"list-style:none;\">";			
 				$callbackNotes .= "<li>Transaction Status: " . $status . "</li>";			
-				$callbackNotes .= "<li>Transaction ID: ". $transaction_id . "</li>";
-				$callbackNotes .= "<li>Payment Received From: ". $callback_transaction_from . "</li>";			
+				$callbackNotes .= "<li>Transaction ID: ". $transaction_id . "</li>";		
 				$callbackNotes .= "<li>Total Paid: ". $transaction_amount . "</li></ul>";	
 				
 				$order->add_order_note( $callbackNotes, $status );
-				
 				
 				// APC Debug, Output and fields
 				$FormFields = 'Order Details: - CALLBACK AUTHORISED: ' . $apcRequestFail . ", Order Note 1: Nochex CALLBACK Passed, Response: " . $output . ", Order Note 2: Nochex Payment Status:" . $status;
