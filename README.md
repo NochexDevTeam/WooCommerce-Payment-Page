@@ -53,6 +53,20 @@ __*You can select the radio button next to this option to make it the default ga
 
 == Changelog ==
 
+= 2.4 =
+
+- Updated the Payment Method description
+- Updated the Payment Form presentation as some content on the page overlapped the payment form background
+- Updated the APC / Callback Response / Order Notes
+
+= 2.3 =
+
+* Bug Fixes *
+
+- Removed References to external resources
+- Updated WordPress and WooCommerce references.
+- Updated and Validated Input sent to Nochex, and data returned.
+
 = 2.2 =
 
 * Update - Fixed the product amount that was passed through to the payment page (Had been missing the Tax amount) Total amount was passed through correctly.
