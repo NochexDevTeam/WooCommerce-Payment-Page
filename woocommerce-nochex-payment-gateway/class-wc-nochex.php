@@ -3,7 +3,7 @@
 Plugin Name: Nochex Payment Gateway for Woocommerce
 Plugin URI: https://github.com/NochexDevTeam/WooCommerce
 Description: Accept Nochex Payments in Woocommerce.
-Version: 2.3
+Version: 2.4
 Author: Nochex Ltd
 License: GPL2
 */
