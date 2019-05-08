@@ -19,7 +19,7 @@ class wc_nochex extends WC_Payment_Gateway {
 	global $woocommerce;
 	
 		$this->id				= 'nochex';
-		$this->icon 			=  plugins_url('images/clear-amex-mp.png', __FILE__ );
+		$this->icon 			=  plugins_url('images/nochex-logo.png', __FILE__ );
 		$this->has_fields 		= false;
 		$this->method_title     = __( 'Nochex', 'woocommerce' );	    
 	        $this->method_description	= __( 'Nochex', 'Accept payments by Nochex');
