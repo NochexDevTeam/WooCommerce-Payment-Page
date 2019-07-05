@@ -19,7 +19,7 @@ class wc_nochex extends WC_Payment_Gateway {
 	global $woocommerce;
 	
 		$this->id				= 'nochex';
-		$this->icon 			=  plugins_url('images/nochex-logo.png', __FILE__ );
+		$this->icon 			= "https://www.nochex.com/logobase-secure-images/logobase-banners/grey-mp.png";
 		$this->has_fields 		= false;
 		$this->method_title     = __( 'Nochex', 'woocommerce' );	    
 	        $this->method_description	= __( 'Nochex', 'Accept payments by Nochex');
@@ -230,11 +230,9 @@ class wc_nochex extends WC_Payment_Gateway {
 	$orders = new WC_Order( $order_id );	
 	
 	/* Nochex Features - check to see if they are present, and updates the value on the payment form*/
-	if ($this->callbackNew == 'yes'){			
-		$optional_2 = "Enabled";
-	}else{
-		$optional_2 = "Disabled";
-	}
+			
+	$optional_2 = "Enabled";
+	
 		
 	if ($this->hide_billing_details == 'yes'){
 		$hide_billing_details = 'true';			
@@ -403,26 +401,21 @@ class wc_nochex extends WC_Payment_Gateway {
 		global $woocommerce;
 		
 
-		if (!empty(esc_html($_POST['order_id']))) {
+		if ($_POST['order_id']) {
 		
 		$order_id = sanitize_text_field($_POST['order_id']);
 		$order_id = esc_html($order_id);
-		$transaction_amount = sanitize_text_field($_POST['amount']);		
-		$transaction_amount = esc_html($transaction_amount);		
+
 		
 		$transaction_id = sanitize_text_field($_POST['transaction_id']);
 		$transaction_id = esc_html($transaction_id);
 		$transaction_date = sanitize_text_field($_POST['transaction_date']);
 		$transaction_date = esc_html($transaction_date);
-		
-		if(!empty($_POST['optional_2'])){
-			$callback_enabled = sanitize_text_field($_POST['optional_2']);	
-			$callback_enabled = esc_html($callback_enabled);	
-		}else{
-			$callback_enabled = "Disabled";
-		} 
+
 				
-		if($callback_enabled == "Enabled"){
+		if($_POST['optional_2'] == "Enabled"){
+			$transaction_amount = sanitize_text_field($_POST['gross_amount']);		
+			$transaction_amount = esc_html($transaction_amount);		
 		
 			$callback_transaction_status = sanitize_text_field($_POST['transaction_status']);
 			$callback_transaction_status = esc_html($callback_transaction_status);
@@ -431,7 +424,7 @@ class wc_nochex extends WC_Payment_Gateway {
 			$callback_transaction_from = sanitize_text_field($_POST['email_address']);
 			$callback_transaction_from = esc_html($callback_transaction_from);
 			
-			$order = new WC_Order ($order_id);
+			$order = new WC_Order($order_id);
 			
 			if ( $order->get_total() != $transaction_amount ) {
 				// Put this order on-hold for manual checking
@@ -507,7 +500,8 @@ class wc_nochex extends WC_Payment_Gateway {
 			}
 			
 		}else{
-		
+			$transaction_amount = sanitize_text_field($_POST['amount']);		
+			$transaction_amount = esc_html($transaction_amount);		
 			$apc_transaction_status = sanitize_text_field($_POST['status']);
 			$apc_transaction_status = esc_html($apc_transaction_status);
 			$apc_transaction_to = sanitize_text_field($_POST['to_email']);
