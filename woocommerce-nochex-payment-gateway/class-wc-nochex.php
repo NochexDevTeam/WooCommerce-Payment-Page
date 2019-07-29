@@ -276,7 +276,13 @@ class wc_nochex extends WC_Payment_Gateway {
 		
 	$filterName = filter_var($item['name'], FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_HIGH | FILTER_FLAG_STRIP_LOW);
 	$filterName = str_replace('|', ',', $filterName);	
-	$taxing = $orders->get_line_tax( $item, false) + $orders->get_item_total( $item, false );
+
+if ($orders->get_prices_include_tax() == 1){
+$taxing = $orders->get_item_total( $item, true );
+}else{
+$taxing = $orders->get_line_tax( $item, false) + $orders->get_item_total( $item, false );
+}
+
 	
 	/* Description */
 	$product = $orders->get_product_from_item( $item );			
