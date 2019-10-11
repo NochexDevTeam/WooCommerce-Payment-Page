@@ -79,6 +79,7 @@ if ($_POST['order_id']) {
 			$FormFields = 'Order Details: - CALLBACK AUTHORISED: ' . $apcRequestFail . ", Order Note 1: Nochex CALLBACK Passed, Response: " . $output . ", Order Note 2: Nochex Payment Status:" . $status;
 			$this->debug_log($FormFields);
 		}
+		exit;
 		} else {
 	
 	$this->debug_log("APC ----------"); 
@@ -134,5 +135,7 @@ if ($_POST['order_id']) {
 				$FormFields = 'Order Details: - APC AUTHORISED: ' . $apcRequestFail . ", Order Note 1: Nochex APC Passed, Response: " . $output . ", Order Note 2: Nochex Payment Status:" . $apc_transaction_status;
 				$this->debug_log($FormFields);
 			}
+		exit;
 	}
+	
 } else wp_die( "Nochex APC Page - Request Failed" );
