@@ -193,8 +193,9 @@ function apc() {
 global $woocommerce;
 
 $this->debug_log("APC - APC / Callback script to update orders - Begin");	
+if($_POST){
 $this->apc = include 'includes/class-wc-nochex-apccallback.php';
-
+}
 }
 
 }
