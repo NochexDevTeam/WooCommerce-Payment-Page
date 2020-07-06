@@ -6,7 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 Plugin Name: Nochex Payment Gateway for Woocommerce
 Plugin URI: https://github.com/NochexDevTeam/WooCommerce
 Description: Accept Nochex Payments in Woocommerce.
-Version: 2.6
+Version: 2.7
 Author: Nochex Ltd
 */
 if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) {
@@ -47,7 +47,7 @@ add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $
 // APC Handler
 add_action( 'woocommerce_api_wc_nochex', array( $this, 'apc' ) );
 // Success Page
-add_action('woocommerce_thankyou_nochex', array( $this, 'receipt_page'));
+add_action('woocommerce_receipt_nochex', array( $this, 'receipt_page'));
 }
 
 /*** Debug Function* Record sections of the Nochex module to check everything is working correctly.*/
@@ -148,30 +148,16 @@ $this->generate_settings_html();
  * receipt_page
 **/
 function receipt_page( $order ) {
-$checkSuccess = esc_html($_REQUEST["finished"]);
-$successVal = sanitize_text_field($checkSuccess);
-if ($successVal == "1") {
-$this->debug_log("Order has been paid - Success Page");
-echo '<h4 style="color:darkgreen;">'.__('Your order has been paid!', 'woocommerce').'</h4>';
-} else {
-$this->debug_log("Get the Nochex Payment Form");	
-/*echo "<style>.payment_method_nochex img {max-height: 80px;height: 80px;margin-left: 50px!important;}</style>";*/
-echo '<p>'.__('If you are not transferred to Nochex click the button below.', 'woocommerce').'</p>';
-echo $this->generate_nochex_form($order);
-}
-}
-/**
-* Generated Nochex Payment Form 
-*/
-function generate_nochex_form( $order_id ) {
 global $woocommerce;
 
-		$this->debug_log("Generate Nochex Form - Get all of the order data and information saved by the merchant");
-		$this->generate_nochex_form = include 'includes/class-wc-nochex-formBuilding.php';
-		
-		$this->debug_log("Generate Nochex Form - Populate the payment form.");
-		include( plugin_dir_path( __FILE__ ) . '/templates/checkout/class-wc-nochex-form.php' );
+$this->debug_log("Generate Nochex Form - Get all of the order data and information saved by the merchant");
+$this->generate_nochex_form = include 'includes/class-wc-nochex-formBuilding.php';
+
+$this->debug_log("Generate Nochex Form - Populate the payment form.");
+include( plugin_dir_path( __FILE__ ) . '/templates/checkout/class-wc-nochex-form.php' );
+	
 }
+
 /**
 * Process the payment and return the result
 **/
@@ -180,7 +166,7 @@ global $woocommerce;
 $order = new WC_Order( $order_id );
 return array(
 	'result' => 'success',
-	'redirect'=> $this->get_return_url( $order ) . "&finished=0"
+	'redirect'=> $order->get_checkout_payment_url(true)
 );
 }
 /**
