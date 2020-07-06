@@ -85,7 +85,7 @@ $contact_number = sanitize_text_field($orders->get_billing_phone());
 $email_address = sanitize_email($orders->get_billing_email());
 /* clean urls */
 $cancel_url = $orders->get_cancel_order_url();
-$success_url = $this->get_return_url( $orders ) . "&finished=1";
+$success_url = $this->get_return_url( $orders );
 $callback_url = $this->callback_url;
 $cancel_url_clean = esc_url( $cancel_url );
 $success_url_clean = esc_url( $success_url );
