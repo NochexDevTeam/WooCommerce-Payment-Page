@@ -4,18 +4,6 @@ defined( 'ABSPATH' ) || exit;
 
 ?>
 
-<style>
-	#loader{
-		display:none!important;
-	}
-</style>
-
-<div style="background:white;position:fixed;width:100%;height:100%;z-index:1000000;top:0px;left:0px;" id="ncxBackgroundForm"></div>
-
-<div id="ncxForm" style="z-index: 1000000;position: fixed;top: 300px;text-align:center;">
-
-	<i style="font-size: 60px;margin: 25px;" class="fa fa-spinner fa-spin"></i>
-
 	<form action="https://secure.nochex.com/default.aspx" method="post" id="nochex_payment_form">
 
 		<input type="hidden" name="merchant_id" value="<?php echo esc_html($nochexParams["Nochex_Settings"]["Merchant_id"]); ?>" />
@@ -76,7 +64,7 @@ defined( 'ABSPATH' ) || exit;
 
 	</form>
 
-	<script type="text/javascript">
+<script type="text/javascript">
 
 	window.onload = function() {
 
@@ -84,6 +72,4 @@ defined( 'ABSPATH' ) || exit;
 
 	}
 
-	</script>
-
-</div>
+</script>
