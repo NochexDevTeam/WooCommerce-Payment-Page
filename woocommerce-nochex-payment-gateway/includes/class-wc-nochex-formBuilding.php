@@ -4,7 +4,7 @@
  * Nochex Payment Form - All the relevant data
 */
 
-$orders = new WC_Order( $order_id );
+$orders = new WC_Order( $order );
 /* Nochex Features - check to see if they are present, and updates the value on the payment form */
 $optional_2 = "Enabled";
 if ($this->hide_billing_details == 'yes') {
