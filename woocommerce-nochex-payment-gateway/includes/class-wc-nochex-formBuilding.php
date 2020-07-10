@@ -5,6 +5,7 @@
 */
 
 $orders = new WC_Order( $order );
+$order_id = $order;
 /* Nochex Features - check to see if they are present, and updates the value on the payment form */
 $optional_2 = "Enabled";
 if ($this->hide_billing_details == 'yes') {
