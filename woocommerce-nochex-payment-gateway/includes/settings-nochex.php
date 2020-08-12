@@ -82,12 +82,5 @@ return array(
 'default' => 'no',
 'desc_tip' => sprintf( __( 'Log Nochex actions, such as APC requests, can be found inside: <code>woocommerce/logs/nochex.txt</code>', 'woocommerce' ), sanitize_file_name( wp_hash( 'nochex' ) ) ),
 'description' => $label,
-),
-'callbackNew' => array(
-'title' => __( 'Callback', 'woocommerce' ),
-'type' => 'checkbox',
-'label' => __( 'Enable Callback', 'woocommerce' ),
-'default' => 'no',
-'desc_tip' => sprintf( __( 'To use the callback functionality, please contact Nochex Support to enable this functionality on your merchant account otherwise this function wont work.', 'woocommerce' ), sanitize_file_name( wp_hash( 'nochex' ) ) ),
 )
 );
