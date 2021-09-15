@@ -17,7 +17,7 @@ if ($_POST['order_id']) {
 	
 	$this->debug_log("Callback ----------"); 
 	
-		$transaction_amount = sanitize_text_field($_POST['gross_amount']);
+		$transaction_amount = sanitize_text_field($_POST['amount']);
 		$transaction_amount = esc_html($transaction_amount);
 		$callback_transaction_status = sanitize_text_field($_POST['transaction_status']);
 		$callback_transaction_status = esc_html($callback_transaction_status);
