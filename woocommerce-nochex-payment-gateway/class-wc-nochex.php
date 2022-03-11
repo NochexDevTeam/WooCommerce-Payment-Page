@@ -38,7 +38,6 @@ $this->xmlitemcollection      = $this->settings['xmlitemcollection'];
 $this->showPostage            = $this->settings['showPostage'];
 $this->test_mode              = $this->settings['test_mode'];
 $this->debug                  = $this->settings['debug'];
-$this->callback               = $this->settings['callbackNew'];
 $this->callback_url = add_query_arg( 'wc-api', 'wc_nochex', home_url( '/' ) );
 
 // Actions
