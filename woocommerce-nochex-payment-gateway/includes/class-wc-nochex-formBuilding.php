@@ -28,7 +28,7 @@ if ($this->showPostage == 'yes') {
 	$amountPostageTotal= number_format( 0, 2, '.', '' );
 }
 // Debug - Features
-$featItems = 'Order Details: - Hide Billing Details Feature: ' . $this->hide_billing_details . '. Test Mode Feature: ' . $this->test_mode. '. Show Postage Feature - ' . $this->showPostage . ", XML Collection Feature: " . $this->xmlitemcollection  . ", Callback Feature: " . $this->callback;
+$featItems = 'Order Details: - Hide Billing Details Feature: ' . $this->hide_billing_details . '. Test Mode Feature: ' . $this->test_mode. '. Show Postage Feature - ' . $this->showPostage . ", XML Collection Feature: " . $this->xmlitemcollection;
 $this->debug_log($featItems); 
 $item_loop = 0;
 $description = '';
