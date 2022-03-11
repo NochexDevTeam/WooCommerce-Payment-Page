@@ -81,6 +81,5 @@ return array(
 'label' => __( 'Enable logging', 'woocommerce' ),
 'default' => 'no',
 'desc_tip' => sprintf( __( 'Log Nochex actions, such as APC requests, can be found inside: <code>woocommerce/logs/nochex.txt</code>', 'woocommerce' ), sanitize_file_name( wp_hash( 'nochex' ) ) ),
-'description' => $label,
 )
 );
