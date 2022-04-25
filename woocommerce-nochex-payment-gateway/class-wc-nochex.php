@@ -6,7 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 Plugin Name: Nochex Payment Gateway for Woocommerce
 Plugin URI: https://github.com/NochexDevTeam/WooCommerce
 Description: Accept Nochex Payments in Woocommerce.
-Version: 2.7.1
+Version: 2.7.2
 Author: Nochex Ltd
 */
 if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) {
@@ -24,11 +24,14 @@ $this->method_description= __('Accept payments by Credit / Debit Card (Nochex), 
 $this->init_form_fields();
 // Load the settings.
 $this->init_settings();
+
+if( !empty($this->settings['hide_billing_details']) ){
 if ($this->settings['hide_billing_details'] == "Yes" || $this->settings['hide_billing_details'] == "yes") {
 $billingNote = "<p style=\"font-weight:bold;margin-bottom:10px!important;\">".$this->settings['description']."</p><p style=\"font-weight:bold;color:red;\">Please check your billing address details match the details on your card that you are going to use.</p>";
 } else {
 $billingNote = $this->settings['description'];
 }
+
 // Define user set variables
 $this->title                  = $this->settings['title'];
 $this->description            = $billingNote;
@@ -38,8 +41,7 @@ $this->xmlitemcollection      = $this->settings['xmlitemcollection'];
 $this->showPostage            = $this->settings['showPostage'];
 $this->test_mode              = $this->settings['test_mode'];
 $this->debug                  = $this->settings['debug'];
-$this->callback_url = add_query_arg( 'wc-api', 'wc_nochex', home_url( '/' ) );
-
+}
 // Actions
 // Update admin options
 add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
@@ -47,6 +49,38 @@ add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $
 add_action( 'woocommerce_api_wc_nochex', array( $this, 'apc' ) );
 // Success Page
 add_action('woocommerce_receipt_nochex', array( $this, 'receipt_page'));
+// Update and check amounts
+add_action('woocommerce_order_button_text', array($this, 'updatePay'));
+}
+
+public function updatePay( $order_button_text ) {
+
+global $post, $woocommerce;
+
+$gtAmount = WC()->session->get('cart_totals');
+
+if( $gtAmount["total"] > 0 && $gtAmount["total"] < 0.99) {
+?>
+	<style id="NCXlowAmt">
+		.payment_method_nochex {
+			display:none;
+		}
+	</style>
+<?php
+} else {
+?>
+	<script id="removeScr">
+		var myEle = document.getElementById("NCXlowAmt");
+		if(myEle){
+			myEle.remove();
+		}
+		document.getElementById("removeScr").remove();		
+	</script>
+<?php
+}
+
+return $order_button_text;
+
 }
 
 /*** Debug Function* Record sections of the Nochex module to check everything is working correctly.*/
@@ -163,10 +197,12 @@ include( plugin_dir_path( __FILE__ ) . '/templates/checkout/class-wc-nochex-form
 function process_payment( $order_id ) {
 global $woocommerce;
 $order = new WC_Order( $order_id );
+if( $order->get_total() >= 0.99) {
 return array(
 	'result' => 'success',
 	'redirect'=> $order->get_checkout_payment_url(true)
 );
+}
 }
 /**
  * Perform Automatic Payment Confirmation (APC)
