@@ -23,6 +23,11 @@ if ($this->test_mode == 'yes') {
 if ($this->showPostage == 'yes') {
 	$amountPostageTotal = number_format( $orders->get_total_shipping() + $orders->get_shipping_tax(), 2, '.', '' );
 	$amountTotal = number_format( $orders->get_total() - $amountPostageTotal, 2, '.', '' );
+	
+	if ($amountTotal == 0){	
+	    $amountTotal = $amountPostageTotal;
+	    $amountPostageTotal= number_format( 0, 2, '.', '' );	
+	}
 } else {
 	$amountTotal = number_format( $orders->get_total(), 2, '.', '' );
 	$amountPostageTotal= number_format( 0, 2, '.', '' );
