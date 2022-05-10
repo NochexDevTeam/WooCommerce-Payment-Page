@@ -46,6 +46,9 @@ __*You can select the radio button next to this option to make it the default ga
 * ** Title** - allows you to determine what your customers will see this payment option as on the checkout page.
 * ** Checkout Message** - controls the message that appears under the payment fields on the checkout page. Here you can list the types of cards you accept.
 * ** Nochex Merchant ID / Email Address** - enter your Nochex account email address or Merchant ID.
+* ** Payment Complete Status - Order status for successful transactions
+* ** Payment and Order Mismatch Status - Order Status for a mismatch with transactions and orders, e.g. Amounts
+* ** Payment Declined Status - Order Status for declined transactions
 * ** Hide Billing Details** - optional feature, if this feature is enabled - the billing address details will be hidden when the customer is sent to Nochex.
 * ** Nochex Test Mode** - optional feature, if this feature is enabled - check to enable Nochex test mode, uncheck to enable LIVE transactions.
 * ** Detailed Product Information** - optional feature, if this feature is enabled - product information that is passed to Nochex will be displayed in a table-format opposed to a paragraph
@@ -56,10 +59,19 @@ __*You can select the radio button next to this option to make it the default ga
 
 == Changelog ==
 
+= 2.7.5.2 = 
+
+- New Status's features to allow you to set specific status for each transaction status
+	- Paid, Declined, and Order Mis-Match
+
+= 2.7.5.1 =
+
+- Update in relation to minor bug found.
+
 = 2.7.5 =
 
 - Tested up to Woocommerce 6.4.1 and WordPress 5.9.3
-- Update in relation to order amounts less than a £1, when a coupon code is used.
+- Update in relation to order amounts less than a Â£1, when a coupon code is used.
 
 = 2.7.4 =
 
