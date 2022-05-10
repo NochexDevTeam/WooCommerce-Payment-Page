@@ -42,7 +42,6 @@ if ( sizeof( $orders->get_items() ) > 0 ) {
 	foreach ( $orders->get_items() as $item ) {
 		if ( $item['qty'] ) {
 		$item_loop++;
-		$product = $orders->get_product_from_item( $item );
 		$item_name = $item['name'];
 		$item_meta = new WC_Order_Item_Product( $item['item_meta'] );
 		$filterName = filter_var($item['name'], FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_HIGH | FILTER_FLAG_STRIP_LOW);
@@ -53,7 +52,6 @@ if ( sizeof( $orders->get_items() ) > 0 ) {
 			$taxing = $orders->get_line_tax( $item, false) + $orders->get_item_total( $item, false );
 		}
 		/* Description */
-		$product = $orders->get_product_from_item( $item );
 		$description .= $filterName .", qty ordered " . $item['qty'] . " x " . number_format($taxing, 2, '.', '' )  . ", ";
 		/* XML Collection */
 		$item_collect.= "<item><id></id><name>". $filterName . "</name><description>". $filterName . "</description><quantity>" . $item['qty'] . "</quantity><price>" . number_format($taxing, 2, '.', '' ) . "</price></item>";
@@ -132,4 +130,3 @@ $nochexParams = array('Nochex_Settings' => Array(
 			'delivery_postcode' => esc_html($shipping_postcode),
 		),
 		);
-		

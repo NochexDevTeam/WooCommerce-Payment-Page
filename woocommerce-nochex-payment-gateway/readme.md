@@ -59,7 +59,7 @@ __*You can select the radio button next to this option to make it the default ga
 = 2.7.5 =
 
 - Tested up to Woocommerce 6.4.1 and WordPress 5.9.3
-- Update in relation to order amounts less than a Â£1, when a coupon code is used.
+- Update in relation to order amounts less than a £1, when a coupon code is used.
 
 = 2.7.4 =
 
