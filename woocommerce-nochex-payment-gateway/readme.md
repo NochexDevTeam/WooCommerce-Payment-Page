@@ -1,4 +1,5 @@
 === WooCommerce Payment Gateway - Nochex ===
+
 Contributors: Nochex 
 Tags: WooCommerce, Credit Cards, Shopping Cart, Nochex Payment Gateway, Nochex, Extension, Gateway
 Requires at least: 3.3
@@ -12,13 +13,16 @@ Accept all major credit cards directly on your WooCommerce site using the Nochex
 WooCommerce Version Tested up to 7.0.1 and WordPress 6.1
 
 == Description ==
+
 = Nochex Online Payment Services =
+
 Website: http://www.nochex.com
 
 Nochex is the UK's leading independent payment service for start-up, small and medium sized online merchants. We provide a simple and straightforward payment platform that makes 
 it easy for your customers to use and for you to get paid, and we back that up with a world-class fraud prevention capability on our safe, secure and reliable PCI-compliant payment pages.
 
 = Key Features =
+
 * Quick and seamless integration into the WooCommerce checkout page.
 * Accept all major credit cards.
 * Prevent Fraud - use 3D Secure, 3D Secure is a standard developed by the card schemes - Visa and MasterCard - to improve the security of Internet payments.
