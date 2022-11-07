@@ -3,14 +3,14 @@
 Contributors: Nochex 
 Tags: WooCommerce, Credit Cards, Shopping Cart, Nochex Payment Gateway, Nochex, Extension, Gateway
 Requires at least: 3.3
-Tested up to: 6.0.2
+Tested up to: 6.1
 Stable tag: 2.7.5.3
 License: GPLv3 or later 
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
 Accept all major credit cards directly on your WooCommerce site using the Nochex payment gateway.
 
-WooCommerce Version Tested up to 6.9.4 and WordPress 6.0.2
+WooCommerce Version Tested up to 7.0.1 WordPress 6.1
 
 == Description ==
 
