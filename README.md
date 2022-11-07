@@ -61,6 +61,10 @@ __*You can select the radio button next to this option to make it the default ga
 
 == Changelog ==
 
+= 2.7.6 =
+
+- Updated APC/Callback page
+
 = 2.7.5.3 =
 
 - Small update towards order status'
