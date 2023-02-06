@@ -77,7 +77,7 @@ global $post, $woocommerce;
 
 $gtAmount = WC()->session->get('cart_totals');
 
-if( $gtAmount["total"] > 0 && $gtAmount["total"] < 0.99) {
+if( $gtAmount["total"] > 0 && $gtAmount["total"] < 0.50) {
 ?>
 	<style id="NCXlowAmt">
 		.payment_method_nochex {
@@ -215,7 +215,7 @@ include( plugin_dir_path( __FILE__ ) . '/templates/checkout/class-wc-nochex-form
 function process_payment( $order_id ) {
 global $woocommerce;
 $order = new WC_Order( $order_id );
-if( $order->get_total() >= 0.99) {
+if( $order->get_total() >= 0.50) {
 return array(
 	'result' => 'success',
 	'redirect'=> $order->get_checkout_payment_url(true)
@@ -247,5 +247,27 @@ function woocommerce_add_nochex_gateway($methods) {
 	return $methods;
 }
 add_filter('woocommerce_payment_gateways', 'woocommerce_add_nochex_gateway' );
+
+/** 
+ * Add setting link to plugins page
+**/
+function nochex_settings_link( $links ) {
+	// Build and escape the URL.
+	$url = esc_url( add_query_arg(
+		'page',
+		'wc-settings',
+		get_admin_url() . 'admin.php?page=wc-settings&tab=checkout&section=nochex'
+	) );
+	// Create the link.
+	$settings_link = "<a href='$url'>" . __( 'Settings' ) . '</a>';
+	// Adds the link to the end of the array.
+	array_unshift(
+		$links,
+		$settings_link
+	);
+	return $links;
+}
+add_filter('plugin_action_links_' . plugin_basename(__FILE__), 'nochex_settings_link');
+
 }
 }

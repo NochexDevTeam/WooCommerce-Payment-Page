@@ -5,7 +5,6 @@
 
 defined( 'ABSPATH' ) || exit;
 
-
 $this->init_settings();
 
 if ( defined( 'WC_LOG_DIR' ) ) {
