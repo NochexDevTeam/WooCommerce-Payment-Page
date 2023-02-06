@@ -39,6 +39,7 @@ it easy for your customers to use and for you to get paid, and we back that up w
 * Configure your Nochex Gateway settings. See below for details.
 
 = Connect to WooCommerce =
+
 To configure the plugin, go to **WooCommerce > Settings** from the left hand menu, then the top tab "Payment Gateways". You should see __" Nochex"__ as an option at the top of the screen. 
 __*You can select the radio button next to this option to make it the default gateway.*__
 
