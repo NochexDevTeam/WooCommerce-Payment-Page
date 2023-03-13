@@ -59,6 +59,12 @@ __*You can select the radio button next to this option to make it the default ga
 
 == Changelog ==
 
+= 2.7.7 =
+
+- Small change to APC system
+
+- Added link to settings page on plugin menu
+
 = 2.7.6.1 =
 
 - Small fix to callback/apc functions to account for customers paying for previously falied orders
