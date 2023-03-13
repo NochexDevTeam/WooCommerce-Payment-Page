@@ -3,7 +3,7 @@ Contributors: Nochex
 Tags: WooCommerce, Credit Cards, Shopping Cart, Nochex Payment Gateway, Nochex, Extension, Gateway
 Requires at least: 3.3
 Tested up to: 6.1.1
-Stable tag: 2.7.6.1
+Stable tag: 2.7.7
 License: GPLv3 or later 
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
