@@ -1,4 +1,4 @@
-7=== WooCommerce Payment Gateway - Nochex ===
+=== WooCommerce Payment Gateway - Nochex ===
 Contributors: Nochex 
 Tags: WooCommerce, Credit Cards, Shopping Cart, Nochex Payment Gateway, Nochex, Extension, Gateway
 Requires at least: 3.3
