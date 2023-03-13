@@ -6,7 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 Plugin Name: Nochex Payment Gateway for Woocommerce
 Plugin URI: https://github.com/NochexDevTeam/WooCommerce
 Description: Accept Nochex Payments in Woocommerce.
-Version: 2.7.6.1
+Version: 2.7.7
 Author: Nochex Ltd
 */
 if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) {
@@ -267,6 +267,7 @@ function nochex_settings_link( $links ) {
 	);
 	return $links;
 }
+
 add_filter('plugin_action_links_' . plugin_basename(__FILE__), 'nochex_settings_link');
 
 }
