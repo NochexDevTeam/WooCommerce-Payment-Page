@@ -9,7 +9,7 @@ License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
 Accept all major credit cards directly on your WooCommerce site using the Nochex payment gateway.
 
-WooCommerce Version Tested up to 7.7.1 and WordPress 6.2.2
+WooCommerce Version Tested up to 7.8.1 and WordPress 6.2.2
 
 == Description ==
 = Nochex Online Payment Services =
