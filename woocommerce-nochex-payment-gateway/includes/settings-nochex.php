@@ -5,7 +5,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-$this->init_settings();
+//$this->init_settings();
 
 if ( defined( 'WC_LOG_DIR' ) ) {
 if ( !empty($this->settings['debug']) == "Yes" ) {

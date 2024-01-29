@@ -6,7 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 Plugin Name: Nochex Payment Gateway for Woocommerce
 Plugin URI: https://github.com/NochexDevTeam/WooCommerce
 Description: Accept Nochex Payments in Woocommerce.
-Version: 2.7.7
+Version: 2.7.9
 Author: Nochex Ltd
 */
 if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) {
@@ -31,34 +31,11 @@ $billingNote = "<p style=\"font-weight:bold;margin-bottom:10px!important;\">".$t
 } else {
 $billingNote = $this->settings['description'];
 }
+}
 
 // Define user set variables
 $this->title                  = $this->settings['title'];
 $this->description            = $billingNote;
-$this->merchant_id            = $this->settings['merchant_id'];
-$this->hide_billing_details   = $this->settings['hide_billing_details'];
-$this->xmlitemcollection      = $this->settings['xmlitemcollection'];
-$this->showPostage            = $this->settings['showPostage'];
-$this->test_mode              = $this->settings['test_mode'];
-$this->debug                  = $this->settings['debug'];
-if (isset($this->settings['order_complete_status'])){
-	$this->order_complete_status = $this->settings['order_complete_status'];
-} else {
-	$this->order_complete_status = "processing";
-}
-if (isset($this->settings['order_onhold_status'])){
-	$this->order_onhold_status = $this->settings['order_onhold_status'];
-} else {
-	$this->order_onhold_status = "on-hold";
-}
-if (isset($this->settings['order_failed_status'])){
-	$this->order_failed_status = $this->settings['order_failed_status'];
-} else {
-	$this->order_failed_status = "failed";
-}
-}
-
-$this->callback_url = add_query_arg( 'wc-api', 'wc_nochex', home_url( '/' ) );
 
 // Actions
 // Update admin options
@@ -202,7 +179,7 @@ function receipt_page( $order ) {
 global $woocommerce;
 
 $this->debug_log("Generate Nochex Form - Get all of the order data and information saved by the merchant");
-$this->generate_nochex_form = include 'includes/class-wc-nochex-formBuilding.php';
+include( plugin_dir_path( __FILE__ ) . 'includes/class-wc-nochex-formBuilding.php');
 
 $this->debug_log("Generate Nochex Form - Populate the payment form.");
 include( plugin_dir_path( __FILE__ ) . '/templates/checkout/class-wc-nochex-form.php' );
