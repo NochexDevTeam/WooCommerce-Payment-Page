@@ -32,7 +32,7 @@ defined( 'ABSPATH' ) || exit;
 		<input type="submit" style="background-color:#08c;color:#fff;" class="button-alt" id="submit_nochex_payment_form" value="Pay via Nochex" />
 	</form>
 <script type="text/javascript">
-	/*window.onload = function() {
+	window.onload = function() {
 		document.getElementById("nochex_payment_form").submit();
-	}*/
+	}
 </script>
