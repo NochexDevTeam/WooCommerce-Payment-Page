@@ -6,19 +6,55 @@ if ( ! defined( 'ABSPATH' ) ) {
 Plugin Name: Nochex Payment Gateway for Woocommerce
 Plugin URI: https://github.com/NochexDevTeam/WooCommerce
 Description: Accept Nochex Payments in Woocommerce.
-Version: 2.8.0
+Version: 2.8.1
 Author: Nochex Ltd
 */
+include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+
 if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) {
+ 
+if ( is_plugin_active('nochexapi/nochexapi.php') ) {		 
+	add_action( 'admin_notices', 'nochex_install_ncx_notice' );	
+	add_action( 'admin_init', 'deactivate_plugin_now' );
+} else {
+	add_action('plugins_loaded', 'woocommerce_nochex_init', 0);
+}
+
+function deactivate_plugin_now() {
+    if ( is_plugin_active('nochex-payment-gateway-for-woocommerce/class-wc-nochex.php') ) {
+        deactivate_plugins('nochex-payment-gateway-for-woocommerce/class-wc-nochex.php');
+    }
+}
+
+/* Admin Notices */
+function nochex_install_wc_notice(){
+	?>
+	<div class="error">
+		<p><?php _e( 'WooCommerce is Required.', 'nochex' ); ?></p>
+	</div>
+	<?php
+}
+function nochex_install_ncx_notice(){
+	?>
+	<div class="error">
+		<p><?php _e( 'You can only have 1 Nochex integration on your website, please deactivate all other Nochex plugins first before enabling. If you are having integration issues we encourage you to contact us at support.nochex.com', 'nochex' ); ?></p>
+	</div>
+	<?php
+}
+
 add_action('plugins_loaded', 'woocommerce_nochex_init', 0);
+
 function woocommerce_nochex_init() {
+
 class wc_nochex extends WC_Payment_Gateway {
+
 function __construct() { 
+
 global $woocommerce;
 $this->id = 'nochex';
 $this->icon = WP_PLUGIN_URL . "/" . plugin_basename( dirname(__FILE__)) . '/images/nochex-logo.png';
 $this->has_fields = false;
-$this->method_title     = __( 'Nochex');
+$this->method_title     = __( 'Nochex Payment Page');
 $this->method_description= __('Accept payments by Credit / Debit Card (Nochex), customers will be redirected to your payment page');
 // Load the form fields.
 $this->init_form_fields();
@@ -114,9 +150,8 @@ public function process_admin_options() {
  */
 function admin_options() {
 ?>
-<h3><?php _e('Pay by Credit / Debit Card (Nochex)', 'woocommerce'); ?></h3>
-<p><?php _e('Once Nochex has been setup and active. Customers will be able to pay by Nochex.', 'woocommerce'); ?></p>
-<blockquote>> Note: Customers will be redirected when they press Place Order</blockquote>
+<h3><?php _e('Pay by Credit / Debit Card (Nochex Payment Page)', 'woocommerce'); ?></h3>
+<p><?php _e('Once Nochex has been setup and active. Customers will be redirected to pay by Nochex after pressing place order on your checkout page.', 'woocommerce'); ?></p>
 
 <?php
 // Nochex Validation - Check module enabled and if merchant field is blank / empty
@@ -176,13 +211,13 @@ $this->generate_settings_html();
  * receipt_page
 **/
 function receipt_page( $order ) {
-global $woocommerce;
+	global $woocommerce;
 
-$this->debug_log("Generate Nochex Form - Get all of the order data and information saved by the merchant");
-include( plugin_dir_path( __FILE__ ) . 'includes/class-wc-nochex-formBuilding.php');
+	$this->debug_log("Generate Nochex Form - Get all of the order data and information saved by the merchant");
+	include( plugin_dir_path( __FILE__ ) . 'includes/class-wc-nochex-formBuilding.php');
 
-$this->debug_log("Generate Nochex Form - Populate the payment form.");
-include( plugin_dir_path( __FILE__ ) . '/templates/checkout/class-wc-nochex-form.php' );
+	$this->debug_log("Generate Nochex Form - Populate the payment form.");
+	include( plugin_dir_path( __FILE__ ) . '/templates/checkout/class-wc-nochex-form.php' );
 	
 }
 
@@ -190,14 +225,17 @@ include( plugin_dir_path( __FILE__ ) . '/templates/checkout/class-wc-nochex-form
 * Process the payment and return the result
 **/
 function process_payment( $order_id ) {
-global $woocommerce;
-$order = new WC_Order( $order_id );
-if( $order->get_total() >= 0.50) {
-return array(
-	'result' => 'success',
-	'redirect'=> $order->get_checkout_payment_url(true)
-);
-}
+	global $woocommerce;
+	$order = new WC_Order( $order_id );
+	
+	if( $order->get_total() >= 0.50) {
+	
+	return array(
+		'result' => 'success',
+		'redirect'=> $order->get_checkout_payment_url(true)
+	);
+	
+	}
 }
 /**
  * Perform Automatic Payment Confirmation (APC)
