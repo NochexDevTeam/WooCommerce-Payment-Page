@@ -6,7 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 Plugin Name: Nochex Payment Gateway for Woocommerce
 Plugin URI: https://github.com/NochexDevTeam/WooCommerce
 Description: Accept Nochex Payments in Woocommerce.
-Version: 2.8.1
+Version: 3.0
 Author: Nochex Ltd
 */
 include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
@@ -50,8 +50,9 @@ class wc_nochex extends WC_Payment_Gateway {
 
 function __construct() { 
 
-global $woocommerce;
-$this->id = 'nochex';
+// global $woocommerce;
+
+$this->id = 'wc_nochex';
 $this->icon = WP_PLUGIN_URL . "/" . plugin_basename( dirname(__FILE__)) . '/images/nochex-logo.png';
 $this->has_fields = false;
 $this->method_title     = __( 'Nochex Payment Page');
@@ -68,6 +69,7 @@ $billingNote = "<p style=\"font-weight:bold;margin-bottom:10px!important;\">".$t
 $billingNote = $this->settings['description'];
 }
 }
+ 
 
 // Define user set variables
 $this->title                  = $this->settings['title'];
@@ -81,38 +83,16 @@ add_action( 'woocommerce_api_wc_nochex', array( $this, 'apc' ) );
 // Success Page
 add_action('woocommerce_receipt_nochex', array( $this, 'receipt_page'));
 // Update and check amounts
-add_action('woocommerce_order_button_text', array($this, 'updatePay'));
+add_filter( 'woocommerce_available_payment_gateways', array( $this, 'disable_payment_gateway_below_minimum') );
+			
 }
 
-public function updatePay( $order_button_text ) {
-
-global $post, $woocommerce;
-
-$gtAmount = WC()->session->get('cart_totals');
-
-if( $gtAmount["total"] > 0 && $gtAmount["total"] < 0.50) {
-?>
-	<style id="NCXlowAmt">
-		.payment_method_nochex {
-			display:none;
-		}
-	</style>
-<?php
-} else {
-?>
-	<script id="removeScr">
-		var myEle = document.getElementById("NCXlowAmt");
-		if(myEle){
-			myEle.remove();
-		}
-		document.getElementById("removeScr").remove();		
-	</script>
-<?php
-}
-
-return $order_button_text;
-
-}
+   function disable_payment_gateway_below_minimum( $available_gateways ) {
+        if ( WC()->cart->total < 0.50 ) { // Replace 50 with your desired minimum amount
+            unset( $available_gateways['wc_nochex'] ); // Replace 'your_payment_gateway_id' with the ID of the payment method
+        }
+        return $available_gateways;
+   }
 
 /*** Debug Function* Record sections of the Nochex module to check everything is working correctly.*/
 function debug_log( $debugMsg ) {
@@ -206,37 +186,26 @@ $this->generate_settings_html();
 </table><!--/.form-table-->
 <?php
 }
-// End admin_options()
-/**
- * receipt_page
-**/
-function receipt_page( $order ) {
-	global $woocommerce;
 
-	$this->debug_log("Generate Nochex Form - Get all of the order data and information saved by the merchant");
-	include( plugin_dir_path( __FILE__ ) . 'includes/class-wc-nochex-formBuilding.php');
+public function process_payment( $order_id ) {
 
-	$this->debug_log("Generate Nochex Form - Populate the payment form.");
-	include( plugin_dir_path( __FILE__ ) . '/templates/checkout/class-wc-nochex-form.php' );
-	
-}
+		include_once dirname( __FILE__ ) . '/includes/class-wc-nochex-request.php';
 
-/**
-* Process the payment and return the result
-**/
-function process_payment( $order_id ) {
-	global $woocommerce;
-	$order = new WC_Order( $order_id );
-	
-	if( $order->get_total() >= 0.50) {
-	
-	return array(
-		'result' => 'success',
-		'redirect'=> $order->get_checkout_payment_url(true)
-	);
-	
+		$order          = wc_get_order( $order_id );
+		$nochex_request = new WC_Nochex_Request( $this );
+		
+		if ($this->settings['test_mode'] == 'yes') {
+			$testTransaction = '100';
+		} else {
+			$testTransaction = '0';
+		}
+		
+		return array(
+			'result'   => 'success',
+			'redirect' => $nochex_request->get_ncxurl( $order, $testTransaction, $this->settings, $this->get_return_url( $order )),
+		);
 	}
-}
+	
 /**
  * Perform Automatic Payment Confirmation (APC)
  *
@@ -254,15 +223,6 @@ $this->apc = include 'includes/class-wc-nochex-apccallback.php';
 
 }
 
-/**
- * Add the Gateway to WooCommerce
-**/
-function woocommerce_add_nochex_gateway($methods) {
-	$methods[] = 'wc_nochex';
-	return $methods;
-}
-add_filter('woocommerce_payment_gateways', 'woocommerce_add_nochex_gateway' );
-
 /** 
  * Add setting link to plugins page
 **/
@@ -271,7 +231,7 @@ function nochex_settings_link( $links ) {
 	$url = esc_url( add_query_arg(
 		'page',
 		'wc-settings',
-		get_admin_url() . 'admin.php?page=wc-settings&tab=checkout&section=nochex'
+		get_admin_url() . 'admin.php?page=wc-settings&tab=checkout&section=wc_nochex'
 	) );
 	// Create the link.
 	$settings_link = "<a href='$url'>" . __( 'Settings' ) . '</a>';
@@ -284,6 +244,56 @@ function nochex_settings_link( $links ) {
 }
 
 add_filter('plugin_action_links_' . plugin_basename(__FILE__), 'nochex_settings_link');
+
+
+/**
+ * Add the Gateway to WooCommerce
+**/
+function woocommerce_add_nochex_gateway($gateways) {
+	$gateways[] = 'wc_nochex';
+	return $gateways;
+}
+add_filter('woocommerce_payment_gateways', 'woocommerce_add_nochex_gateway' );
+
+
+/**
+ * Custom function to declare compatibility with cart_checkout_blocks feature 
+*/
+function declare_ncx_cart_checkout_blocks_compatibility() {
+    // Check if the required class exists
+    if (class_exists('\Automattic\WooCommerce\Utilities\FeaturesUtil')) {
+        // Declare compatibility for 'cart_checkout_blocks'
+        \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('cart_checkout_blocks', __FILE__, true);
+    }
+}
+// Hook the custom function to the 'before_woocommerce_init' action
+add_action('before_woocommerce_init', 'declare_ncx_cart_checkout_blocks_compatibility');
+
+// Hook the custom function to the 'woocommerce_blocks_loaded' action
+add_action( 'woocommerce_blocks_loaded', 'register_order_approval_payment_method_type_ncx' );
+
+/**
+ * Custom function to register a payment method type
+
+ */
+function register_order_approval_payment_method_type_ncx() {
+    // Check if the required class exists
+    if ( ! class_exists( 'Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType' ) ) {
+        return;
+    }
+
+    // Include the custom Blocks Checkout class
+    require_once plugin_dir_path(__FILE__) . '/includes/class-block.php';
+
+    // Hook the registration function to the 'woocommerce_blocks_payment_method_type_registration' action
+    add_action(
+        'woocommerce_blocks_payment_method_type_registration',
+        function( Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry $payment_method_registry ) {
+            // Register an instance of My_Custom_Gateway_Blocks
+            $payment_method_registry->register( new WC_Nochex_Blocks );
+        }
+    );
+}
 
 }
 }
