@@ -88,7 +88,8 @@ add_filter( 'woocommerce_available_payment_gateways', array( $this, 'disable_pay
 }
 
    function disable_payment_gateway_below_minimum( $available_gateways ) {
-        if ( WC()->cart->total < 0.50 ) { // Replace 50 with your desired minimum amount
+   
+        if ( !empty(WC()->cart->total) < 0.50 ) { // Replace 50 with your desired minimum amount
             unset( $available_gateways['wc_nochex'] ); // Replace 'your_payment_gateway_id' with the ID of the payment method
         }
         return $available_gateways;
