@@ -70,7 +70,6 @@ $billingNote = $this->settings['description'];
 }
 }
  
-
 // Define user set variables
 $this->title                  = $this->settings['title'];
 $this->description            = $billingNote;
@@ -100,11 +99,7 @@ function debug_log( $debugMsg ) {
 $log = new WC_Logger();
 $log->add( 'Nochex', $debugMsg );
 }
-
-public function needs_setup() {		
-return ! is_email( $this->merchant_id );
-}
-
+	
 /**
 * Initialise Gateway Settings Form Fields
 **/
