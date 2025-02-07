@@ -59,6 +59,10 @@ __*You can select the radio button next to this option to make it the default ga
 
 == Changelog ==
 
+= 3.0.1 =
+
+- Minor update to resolve Nochex block not showing in some instances
+
 = 3.0 =
 
 - Updated to work with WordPress / Woocommerce Blocks
