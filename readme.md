@@ -57,6 +57,11 @@ __*You can select the radio button next to this option to make it the default ga
 * ** Callback** - optional feature - This feature updates orders once a successful transaction has taken place. This works similarly to our APC system but in order to use this option you will need to contact Nochex Support.
 * ** Save Changes.** 
 
+=== Nochex Script Monitor ===
+To help improve the security and visibility of your WordPRess site, we recommend using our Nochex Script Monitor - https://github.com/NochexDevTeam/Nochex-Script-Monitor 
+
+This lightweight tool keeps an eye on your site's scripts - whether inline, external, or dynamically generated and alerts you to any changes. It's a simple way to stay informed about what is running behind the scenes, and helping you to spot any potential issues early without needing too deep technical knowledge but advise to consult with your developer for assistance.
+
 == Changelog ==
 
 = 3.0.1 =
@@ -205,3 +210,4 @@ Some minor updates to the APC system to ensure the module is TLS 1.2 ready.
 
 = 0.1 =
 * First Release.
+
