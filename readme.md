@@ -1,15 +1,15 @@
-=== WooCommerce Payment Gateway - Nochex ===
+=== Nochex Payment Gateway for Woocommerce ===
 Contributors: Nochex 
-Tags: WooCommerce, Credit Cards, Shopping Cart, Nochex Payment Gateway, Nochex, Extension, Gateway
+Tags: Credit Cards, Shopping Cart, Nochex Payment Gateway, Nochex, Extension, Gateway, WooCommerce
 Requires at least: 3.3
 Tested up to: 6.7.1
 Stable tag: 2.7.8
 License: GPLv3 or later 
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-Accept all major credit cards directly on your WooCommerce site using the Nochex payment gateway.
+Accept all major credit cards directly on your WooCommerce website using the Nochex payment gateway.
 
-WooCommerce Version Tested up to 9.6.1 and WordPress 6.7.1
+WooCommerce Version Tested up to 9.6.0 and WordPress 6.7.1
 
 == Description ==
 = Nochex Online Payment Services =
@@ -57,20 +57,11 @@ __*You can select the radio button next to this option to make it the default ga
 * ** Callback** - optional feature - This feature updates orders once a successful transaction has taken place. This works similarly to our APC system but in order to use this option you will need to contact Nochex Support.
 * ** Save Changes.** 
 
-=== Nochex Script Monitor ===
-To help improve the security and visibility of your WordPRess site, we recommend using our Nochex Script Monitor - https://github.com/NochexDevTeam/Nochex-Script-Monitor 
-
-This lightweight tool keeps an eye on your site's scripts - whether inline, external, or dynamically generated and alerts you to any changes. It's a simple way to stay informed about what is running behind the scenes, and helping you to spot any potential issues early without needing too deep technical knowledge but advise to consult with your developer for assistance.
-
 == Changelog ==
 
-= 3.0.1 =
-
-- Minor update to resolve Nochex block not showing in some instances
-  
 = 3.0 =
 
-- Updated to work with WordPress / Woocommerce Blocks
+- Updated support for WordPress / Woocommerce Blocks
 - Updated APC / Callback script
 
 = 2.8.1 =
@@ -210,4 +201,3 @@ Some minor updates to the APC system to ensure the module is TLS 1.2 ready.
 
 = 0.1 =
 * First Release.
-
