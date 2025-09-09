@@ -1,52 +1,50 @@
 <?php
 /**
- * Settings for Nochex Gateway.
+ * Settings for Nochex Payment Gateway.
 */
 
 defined( 'ABSPATH' ) || exit;
 
-//$this->init_settings();
-
 if ( defined( 'WC_LOG_DIR' ) ) {
 if ( !empty($this->settings['debug']) == "Yes" ) {
 	$log_url = add_query_arg( 'tab', 'logs', add_query_arg( 'page', 'wc-status', admin_url( 'admin.php' ) ) );
-	$log_key = 'class-wc-nochex-here-' . sanitize_file_name( wp_hash( 'class-wc-nochex' ) ) . '-log';
-	$log_url = add_query_arg( 'log_file', $log_key, $log_url );
-
-	$label = '' . sprintf( __( '%1$sView Your Nochex Logs%2$s', 'your-textdomain-here' ), '<a href="' . esc_url( $log_url ) . '">', '</a>' );
+	$log_key = 'class-nochex-payment-gateway-for-woocommerce-here-' . sanitize_file_name( wp_hash( 'class-nochex-payment-gateway-for-woocommerce-' ) ) . '-log';
+	$log_url = add_query_arg( 'log_file', $log_key, $log_url );	
+	/* translators: 1: Link to Nochex Logs. */
+	$label = '' . sprintf( __( '%1$sView Your Nochex Logs%2$s', 'nochex-payment-gateway-for-woocommerce' ), '<a href="' . esc_url( $log_url ) . '">', '</a>' );
 }
 }
 
 return array(
 'enabled' => array(
-'title' => __( 'Enable/Disable', 'woocommerce' ),
+'title' => __( 'Enable/Disable', 'nochex-payment-gateway-for-woocommerce' ),
 'type' => 'checkbox',
-'label' => __( 'Enable Nochex', 'woocommerce' ),
+'label' => __( 'Enable Nochex', 'nochex-payment-gateway-for-woocommerce' ),
 'default' => 'yes'
 ), 
 'title' => array(
-'title' => __( 'Title', 'woocommerce' ),
+'title' => __( 'Title', 'nochex-payment-gateway-for-woocommerce' ),
 'type' => 'text',
-'desc_tip' => __( 'Title of the Nochex payment option, visible to customers at the checkout.', 'woocommerce' ),
-'default' => __( 'Nochex', 'woocommerce' ),
+'desc_tip' => __( 'Title of the Nochex payment option, visible to customers at the checkout.', 'nochex-payment-gateway-for-woocommerce' ),
+'default' => __( 'Nochex', 'nochex-payment-gateway-for-woocommerce' ),
 'placeholder' => 'example: Pay by Credit/Debit Card.',
 ),
 'description' => array(
-'title' => __( 'Checkout Message', 'woocommerce' ),
+'title' => __( 'Checkout Message', 'nochex-payment-gateway-for-woocommerce' ),
 'type' => 'textarea',
-'desc_tip' => __( 'Message visible to customers after selecting Nochex as their payment option.', 'woocommerce' ),
-'default' => __('Pay securely using Nochex. You can pay using your credit or debit card.', 'woocommerce'),
+'desc_tip' => __( 'Message visible to customers after selecting Nochex as their payment option.', 'nochex-payment-gateway-for-woocommerce' ),
+'default' => __('Pay securely using Nochex. You can pay using your credit or debit card.', 'nochex-payment-gateway-for-woocommerce'),
 'placeholder' => 'example: Pay securely using Nochex. You can pay using your credit or debit card.',
 ),
 'merchant_id' => array(
-'title' => __( 'Nochex Merchant ID /<br/> Email Address', 'woocommerce' ),
+'title' => __( 'Nochex Merchant ID /<br/> Email Address', 'nochex-payment-gateway-for-woocommerce' ),
 'type' => 'text',
 'desc_tip' => 'Your Nochex Merchant ID / Email address for example: test123@test.com',
 'default' => '',
 'placeholder' => 'example: test123@test.com or test123',
 ),
 'order_complete_status' => array(
-'title' => __( 'Payment complete status' ),
+'title' => __( 'Payment complete status', 'nochex-payment-gateway-for-woocommerce'),
 'type' => 'select',
 'desc_tip' => 'Select the order status you wish to be assigned after a sucessful transaction',
 'default' => 'processing',
@@ -60,7 +58,7 @@ return array(
 ),
 ),
 'order_onhold_status' => array(
-'title' => __( 'Payment and order mismatch status' ),
+'title' => __( 'Payment and order mismatch status', 'nochex-payment-gateway-for-woocommerce'),
 'type' => 'select',
 'desc_tip' => 'Select the order status you wish to be assigned for a transaction and order mismatch',
 'default' => 'on-hold',
@@ -74,7 +72,7 @@ return array(
 ),
 ),
 'order_failed_status' => array(
-'title' => __( 'Payment declined status' ),
+'title' => __( 'Payment declined status', 'nochex-payment-gateway-for-woocommerce'),
 'type' => 'select',
 'desc_tip' => 'Select the order status you wish to be assigned after a payment declines',
 'default' => 'pending',
@@ -88,39 +86,39 @@ return array(
 ),
 ),
 'hide_billing_details' => array(
-'title' => __( 'Hide Billing Details', 'woocommerce' ),
+'title' => __( 'Hide Billing Details', 'nochex-payment-gateway-for-woocommerce' ),
 'type' => 'checkbox',
-'label' => __( 'Hide Customer Billing Details', 'woocommerce' ),
-'desc_tip' => __( 'Hide the customer\'s billing details so they cannot be changed when the customer is sent to Nochex.', 'woocommerce' ),
+'label' => __( 'Hide Customer Billing Details', 'nochex-payment-gateway-for-woocommerce' ),
+'desc_tip' => __( 'Hide the customer\'s billing details so they cannot be changed when the customer is sent to Nochex.', 'nochex-payment-gateway-for-woocommerce' ),
 'default' => 'no',
 ), 
 'test_mode' => array(
-'title' => __( 'Nochex Test Mode', 'woocommerce' ),
+'title' => __( 'Nochex Test Mode', 'nochex-payment-gateway-for-woocommerce' ),
 'type' => 'checkbox',
-'label' => __( 'Enable Nochex Test Mode', 'woocommerce' ),
-'desc_tip' => __( 'Enable this feature to allow test transactions. Note: Ensure this option is disabled to accept live payments', 'woocommerce' ),
-'description' => __( '<font style="font-weight:bold; color:red;">Note: To accept live transactions disable this option.</font>', 'woocommerce' ),
+'label' => __( 'Enable Nochex Test Mode', 'nochex-payment-gateway-for-woocommerce' ),
+'desc_tip' => __( 'Enable this feature to allow test transactions. Note: Ensure this option is disabled to accept live payments', 'nochex-payment-gateway-for-woocommerce' ),
+'description' => __( 'Note: To accept live transactions disable this option.', 'nochex-payment-gateway-for-woocommerce' ),
 'default' => 'no',
 ), 
 'xmlitemcollection' => array(
-'title' => __( 'Detailed Product Information', 'woocommerce' ),
+'title' => __( 'Detailed Product Information', 'nochex-payment-gateway-for-woocommerce' ),
 'type' => 'checkbox',
-'label' => __( 'Enable Detailed Product Information', 'woocommerce' ),
-'desc_tip' => __( 'If Detailed Product Information is selected, a detailed product and structured list will display on your Nochex Payment Page.', 'woocommerce' ),
+'label' => __( 'Enable Detailed Product Information', 'nochex-payment-gateway-for-woocommerce' ),
+'desc_tip' => __( 'If Detailed Product Information is selected, a detailed product and structured list will display on your Nochex Payment Page.', 'nochex-payment-gateway-for-woocommerce' ),
 'default' => 'no',
 ), 
 'showPostage' => array(
-'title' => __( 'Nochex Show Postage', 'woocommerce' ),
+'title' => __( 'Nochex Show Postage', 'nochex-payment-gateway-for-woocommerce' ),
 'type' => 'checkbox',
-'label' => __( 'Enable Show Postage', 'woocommerce' ),
-'desc_tip' => __( 'If ShowPosting is selected, postage will be displayed on your Nochex payment page.', 'woocommerce' ),
+'label' => __( 'Enable Show Postage', 'nochex-payment-gateway-for-woocommerce' ),
+'desc_tip' => __( 'If ShowPosting is selected, postage will be displayed on your Nochex payment page.', 'nochex-payment-gateway-for-woocommerce' ),
 'default' => 'no',
 ), 
 'debug' => array(
-'title' => __( 'Debug Log', 'woocommerce' ),
+'title' => __( 'Debug Log', 'nochex-payment-gateway-for-woocommerce' ),
 'type' => 'checkbox',
-'label' => __( 'Enable logging', 'woocommerce' ),
+'label' => __( 'Enable logging', 'nochex-payment-gateway-for-woocommerce' ),
 'default' => 'no',
-'desc_tip' => sprintf( __( 'Log Nochex actions, such as APC requests, can be found inside: <code>woocommerce/logs/nochex.txt</code>', 'woocommerce' ), sanitize_file_name( wp_hash( 'nochex' ) ) ),
+'desc_tip' => sprintf( __( 'Log Nochex actions, such as APC requests, can be found inside: <code>woocommerce/logs/nochex.txt</code>', 'nochex-payment-gateway-for-woocommerce' ), sanitize_file_name( wp_hash( 'nochex' ) ) ),
 )
 );
