@@ -62,7 +62,7 @@ __*You can select the radio button next to this option to make it the default ga
 = 3.0.1 =
 
 - Update / Plugin Clean up
-- Tested up to WordPress 6.8.2 and Woocommerce 10.4.3
+- Tested up to WordPress 6.8.2 and Woocommerce 10.1.2
 - Fixed Postage bug
 
 = 3.0 =
@@ -207,4 +207,5 @@ Some minor updates to the APC system to ensure the module is TLS 1.2 ready.
 
 = 0.1 =
 * First Release.
+
 
