@@ -6,7 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 Plugin Name: Nochex Payment Gateway for Woocommerce
 Plugin URI: https://github.com/NochexDevTeam/WooCommerce
 Description: Accept Nochex Payments in Woocommerce.
-Version: 3.0.1
+Version: 3.0.2
 Author: Nochex Ltd
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -33,19 +33,17 @@ function deactivate_plugin_now() {
 function nochex_install_wc_notice(){
 	?>
 	<div class="error">
-		<p><?php esc_attr__( 'WooCommerce is Required.', 'nochex-payment-gateway-for-woocommerce' ); ?></p>
+		<p><?php esc_html_e( 'WooCommerce is Required.', 'nochex-payment-gateway-for-woocommerce' ); ?></p>
 	</div>
 	<?php
 }
 function nochex_install_ncx_notice(){
 	?>
 	<div class="error">
-		<p><?php esc_attr__( 'You can only have 1 Nochex integration on your website, please deactivate all other Nochex plugins first before enabling. If you are having integration issues we encourage you to contact us at support.nochex.com', 'nochex-payment-gateway-for-woocommerce' ); ?></p>
+		<p><?php esc_html_e( 'You can only have 1 Nochex integration on your website, please deactivate all other Nochex plugins first before enabling. If you are having integration issues we encourage you to contact us at support.nochex.com', 'nochex-payment-gateway-for-woocommerce' ); ?></p>
 	</div>
 	<?php
 }
-
-add_action('plugins_loaded', 'woocommerce_nochex_init', 0);
 
 function woocommerce_nochex_init() {
 
@@ -54,7 +52,7 @@ class nochex_payment_gateway_for_woocommerce extends WC_Payment_Gateway {
 function __construct() { 
 
 $this->id = 'nochex_payment_gateway_for_woocommerce';
-$this->icon = WP_PLUGIN_URL . "/" . plugin_basename( dirname(__FILE__)) . '/images/nochex-logo.png';
+$this->icon = plugin_dir_url( __FILE__ ) . 'images/nochex-logo.png';
 $this->has_fields = false;
 $this->method_title     = esc_attr__( 'Nochex Payment Page.', 'nochex-payment-gateway-for-woocommerce' );
 $this->method_description= esc_attr__( 'Accept payments by Credit / Debit Card (Nochex), customers will be redirected to your payment page', 'nochex-payment-gateway-for-woocommerce' );
@@ -63,16 +61,18 @@ $this->init_form_fields();
 // Load the settings.
 $this->init_settings();
 
-if( !empty($this->settings['hide_billing_details']) ){
-if ($this->settings['hide_billing_details'] == "Yes" || $this->settings['hide_billing_details'] == "yes") {
-$billingNote = "<p style=\"font-weight:bold;margin-bottom:10px!important;\">".$this->settings['description']."</p><p style=\"font-weight:bold;color:red;\">Please check your billing address details match the details on your card that you are going to use.</p>";
+if( ! empty( $this->settings['hide_billing_details'] ) ){
+if ( 'Yes' === $this->settings['hide_billing_details'] || 'yes' === $this->settings['hide_billing_details'] ) {
+$billingNote = "<p style=\"font-weight:bold;margin-bottom:10px!important;\">" . ( $this->settings['description'] ?? '' ) . "</p><p style=\"font-weight:bold;color:red;\">Please check your billing address details match the details on your card that you are going to use.</p>";
 } else {
-$billingNote = $this->settings['description'];
+$billingNote = $this->settings['description'] ?? '';
 }
+} else {
+	$billingNote = $this->settings['description'] ?? '';
 }
  
 // Define user set variables
-$this->title                  = $this->settings['title'];
+$this->title                  = $this->settings['title'] ?? __( 'Nochex', 'nochex-payment-gateway-for-woocommerce' );
 $this->description            = $billingNote;
 
 // Actions
@@ -86,8 +86,9 @@ add_action('woocommerce_receipt_nochex', array( $this, 'receipt_page'));
 add_filter( 'woocommerce_available_payment_gateways', array( $this, 'disable_payment_gateway_below_minimum') );
 			
 }
-   function disable_payment_gateway_below_minimum( $available_gateways ) {   
-        if ( !empty(WC()->cart->total) < 0.50 ) { // Replace 50 with your desired minimum amount
+   function disable_payment_gateway_below_minimum( $available_gateways ) {
+        $total = ( WC()->cart && method_exists( WC()->cart, 'get_total' ) ) ? (float) WC()->cart->get_total( 'edit' ) : 0;
+        if ( $total > 0 && $total < 0.50 ) {
             unset( $available_gateways['nochex_payment_gateway_for_woocommerce'] ); // Replace 'your_payment_gateway_id' with the ID of the payment method
         }
         return $available_gateways;
@@ -125,14 +126,16 @@ public function process_admin_options() {
  */
 function admin_options() {
 ?>
-<h3><?php esc_attr__('Pay by Credit / Debit Card (Nochex Payment Page)', 'nochex-payment-gateway-for-woocommerce'); ?></h3>
-<p><?php esc_attr__('Once Nochex has been setup and active. Customers will be redirected to pay by Nochex after pressing place order on your checkout page.', 'nochex-payment-gateway-for-woocommerce'); ?></p>
+<h3><?php esc_html_e( 'Pay by Credit / Debit Card (Nochex Payment Page)', 'nochex-payment-gateway-for-woocommerce' ); ?></h3>
+<p><?php esc_html_e('Once Nochex has been setup and active. Customers will be redirected to pay by Nochex after pressing place order on your checkout page.', 'nochex-payment-gateway-for-woocommerce'); ?></p>
 
 <?php
 // Nochex Validation - Check module enabled and if merchant field is blank / empty
-if ( !empty($_REQUEST["woocommerce_nochex_enabled"]) == 1) {
+$posted_enabled = isset( $_POST['woocommerce_nochex_enabled'] ) ? sanitize_text_field( wp_unslash( $_POST['woocommerce_nochex_enabled'] ) ) : '';
+$posted_merchant_id = isset( $_POST['woocommerce_nochex_merchant_id'] ) ? sanitize_text_field( wp_unslash( $_POST['woocommerce_nochex_merchant_id'] ) ) : '';
+if ( '1' === $posted_enabled ) {
 	$this->debug_log("Nochex - Settings Save - If Nochex is enabled, begin checking required field ** Nochex Merchant ID / Email Address");	
-	if (empty($_REQUEST["woocommerce_nochex_merchant_id"])) {
+	if ( '' === $posted_merchant_id ) {
 	$this->debug_log("Nochex - Settings - Empty - Show Error message");	
 	$this->debug_log("Reload Nochex Settings for the merchant");	
 	?>
@@ -187,9 +190,13 @@ public function process_payment( $order_id ) {
 		include_once dirname( __FILE__ ) . '/includes/class-nochex-payment-gateway-for-woocommerce-request.php';
 
 		$order          = wc_get_order( $order_id );
+		if ( ! $order ) {
+			wc_add_notice( __( 'Unable to load the order for payment.', 'nochex-payment-gateway-for-woocommerce' ), 'error' );
+			return array( 'result' => 'failure' );
+		}
 		$nochex_request = new Nochex_Payment_Gateway_For_Woocommerce_Request( $this );
 		
-		if ($this->settings['test_mode'] == 'yes') {
+		if ( isset( $this->settings['test_mode'] ) && 'yes' === $this->settings['test_mode'] ) {
 			$testTransaction = '100';
 		} else {
 			$testTransaction = '0';
@@ -211,7 +218,7 @@ function apc() {
 global $woocommerce;
 
 $this->debug_log("APC - APC / Callback script to update orders - Begin");	
-if($_POST){
+if ( ! empty( $_POST ) ) {
 $this->apc = include 'includes/class-nochex-payment-gateway-for-woocommerce-apccallback.php';
 }
 }
@@ -223,11 +230,7 @@ $this->apc = include 'includes/class-nochex-payment-gateway-for-woocommerce-apcc
 **/
 function nochex_settings_link( $links ) {
 	// Build and escape the URL.
-	$url = esc_url( add_query_arg(
-		'page',
-		'wc-settings',
-		get_admin_url() . 'admin.php?page=wc-settings&tab=checkout&section=nochex_payment_gateway_for_woocommerce'
-	) );
+	$url = esc_url( admin_url( 'admin.php?page=wc-settings&tab=checkout&section=nochex_payment_gateway_for_woocommerce' ) );
 	// Create the link.
 	$settings_link = "<a href='$url'>" . esc_attr__( 'Settings.', 'nochex-payment-gateway-for-woocommerce' ) . '</a>';
 	// Adds the link to the end of the array.

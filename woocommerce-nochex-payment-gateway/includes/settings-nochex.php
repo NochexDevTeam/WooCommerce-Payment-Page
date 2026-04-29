@@ -6,7 +6,7 @@
 defined( 'ABSPATH' ) || exit;
 
 if ( defined( 'WC_LOG_DIR' ) ) {
-if ( !empty($this->settings['debug']) == "Yes" ) {
+if ( isset( $this->settings['debug'] ) && ( 'Yes' === $this->settings['debug'] || 'yes' === $this->settings['debug'] ) ) {
 	$log_url = add_query_arg( 'tab', 'logs', add_query_arg( 'page', 'wc-status', admin_url( 'admin.php' ) ) );
 	$log_key = 'class-nochex-payment-gateway-for-woocommerce-here-' . sanitize_file_name( wp_hash( 'class-nochex-payment-gateway-for-woocommerce-' ) ) . '-log';
 	$log_url = add_query_arg( 'log_file', $log_key, $log_url );	

@@ -73,7 +73,6 @@ class Nochex_Payment_Gateway_For_Woocommerce_Request {
 				if ( $item['qty'] ) {
 				$item_loop++;
 				$item_name = $item['name'];
-				$item_meta = new WC_Order_Item_Product( $item['item_meta'] );
 				$filterName = filter_var($item['name'], FILTER_SANITIZE_SPECIAL_CHARS, FILTER_FLAG_STRIP_HIGH | FILTER_FLAG_STRIP_LOW);
 				$filterName = str_replace('|', ',', $filterName);
 				if ($order->get_prices_include_tax() == 1) {

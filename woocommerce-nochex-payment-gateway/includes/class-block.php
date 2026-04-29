@@ -1,19 +1,19 @@
 <?php
 
 use Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType; 
-use Automattic\WooCommerce\Blocks\Assets\Api;
 
 final class Nochex_Payment_Gateway_For_Woocommerce_Blocks extends AbstractPaymentMethodType {
 
     private $gateway;
 	
-	private $asset_api;
-	
     protected $name = 'nochex_payment_gateway_for_woocommerce';
 
     public function initialize() {
-        $this->settings = get_option( 'woocommerce_wc_nochex_settings', [] );
-        $this->gateway = new Nochex_Payment_Gateway_For_Woocommerce();
+        $this->settings = get_option( 'woocommerce_nochex_payment_gateway_for_woocommerce_settings', [] );
+        if ( function_exists( 'WC' ) && WC()->payment_gateways() ) {
+            $gateways = WC()->payment_gateways()->payment_gateways();
+            $this->gateway = $gateways[ $this->name ] ?? null;
+        }
     }
 
    public function is_active() {		
@@ -32,11 +32,11 @@ final class Nochex_Payment_Gateway_For_Woocommerce_Blocks extends AbstractPaymen
                 'wp-html-entities',
                 'wp-i18n',
             ],
-            true,
-            null
+            '3.0.2',
+            true
         );
-        if( function_exists( 'wp_set_script_translations' ) ) {            
-            wp_set_script_translations( 'nochex_payment_gateway_for_woocommerce-blocks-integration');
+        if( function_exists( 'wp_set_script_translations' ) ) {
+            wp_set_script_translations( 'nochex_payment_gateway_for_woocommerce-blocks-integration', 'nochex-payment-gateway-for-woocommerce' );
             
         }
         return [ 'nochex_payment_gateway_for_woocommerce-blocks-integration' ];
@@ -44,6 +44,9 @@ final class Nochex_Payment_Gateway_For_Woocommerce_Blocks extends AbstractPaymen
     }
 
     public function get_payment_method_data() {
+        if ( ! $this->gateway ) {
+            return [];
+        }
         return [
             'title' => $this->gateway->title,
             'description' => $this->gateway->description,
@@ -53,7 +56,10 @@ final class Nochex_Payment_Gateway_For_Woocommerce_Blocks extends AbstractPaymen
 
 
 	public function get_supported_features() {
-		$gateway  = new nochex_payment_gateway_for_woocommerce();
+		if ( ! $this->gateway ) {
+			return array( 'products' );
+		}
+		$gateway  = $this->gateway;
 		$features = array_filter( $gateway->supports, array( $gateway, 'supports' ) );
 
 		return apply_filters( '__experimental_woocommerce_blocks_payment_gateway_features_list', $features, $this->get_name() );
